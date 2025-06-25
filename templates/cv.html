@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Poppins', sans-serif;
+    }
+    .navbar {
+      background-color: #007bff;
+    }
+    .navbar-brand, .nav-link {
+      color: white !important;
+    }
+    .cv-container {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .profile-header img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+    }
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #007bff;
+      margin-top: 20px;
+    }
+    .footer {
+      background-color: #343a40;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">Best Games</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Beranda</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/rate/">Rate</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/cv/">Tentang Saya</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- CV Content -->
+  <div class="container cv-container">
+    <div class="profile-header">
+      <img src="ogi.jpg" alt="Ogi Febrian Saputra">
+      <h1>Ogi Febrian Saputra</h1>
+      <p>Teknik Informatika</p>
+    </div>
+
+    <div class="section-title">Profil</div>
+    <p>Saya mahasiswa semester 4 Prodi Teknik Informatika, fokus pada penelitian dan pengembangan teknologi, khususnya sistem informasi dan perangkat lunak.</p>
+
+    <div class="section-title">Pendidikan</div>
+    <ul>
+      <li>Universitas Muhammadiyah Kalimantan Timur (2023 - Sekarang) S1 Teknik Informatika</li>
+    </ul>
+
+    <div class="section-title">Sekolah</div>
+    <ul>
+      <li>Sekolah Dasar Muhammadiyah Tenggarong (2011 - 2017)</li>
+      <li>Madrasah Tsanawiyah Negeri 1 Kutai Kartanegara (2017 - 2020)</li>
+      <li>Madrasah Aliyah Negeri 1 Kutai Kartanegara (2020 - 2023)</li>
+    </ul>
+
+    <div class="section-title">Bahasa</div>
+    <ul>
+      <li>Indonesia</li>
+    </ul>
+
+    <div class="section-title">Kontak</div>
+    <ul>
+      <li><strong>Telepon:</strong> 082110152175</li>
+      <li><strong>Email:</strong> 2311102441099@umkt.ac.id</li>
+      <li><strong>Alamat:</strong> Tenggarong, Kalimantan Timur</li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Ogi Febrian Saputra. All Rights Reserved.</p>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+  <h4>Form Kategori</h4>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Simpan</button>
+    <a href="{% url 'admin_kategori_list' %}" class="btn btn-secondary">Kembali</a>
+  </form>
+{% endblock %}
