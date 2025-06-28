@@ -1,0 +1,474 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ film.title }} - StreamFlix</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.0.4/video-js.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: #000;
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .video-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+        
+        .back-button {
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+        }
+        
+        .film-title-header {
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .video-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            z-index: 20;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+        
+        .film-info {
+            max-width: 600px;
+        }
+        
+        .film-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .film-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: #ccc;
+        }
+        
+        .film-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: #ddd;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: #e50914;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #f40612;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            color: #fff;
+        }
+        
+        .recommendations {
+            padding: 2rem;
+            background: #111;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+        
+        .film-scroll {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            scrollbar-width: none;
+        }
+        
+        .film-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .film-card {
+            min-width: 200px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .film-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .film-poster {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+        
+        .film-card-info {
+            padding: 1rem;
+        }
+        
+        .film-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        
+        .film-card-meta {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        
+        /* Video.js customization */
+        .video-js {
+            background-color: #000;
+        }
+        
+        .video-js .vjs-big-play-button {
+            background-color: rgba(229, 9, 20, 0.8);
+            border-color: #e50914;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            margin-left: -40px;
+            margin-top: -40px;
+        }
+        
+        .video-js .vjs-big-play-button:hover {
+            background-color: rgba(229, 9, 20, 1);
+        }
+        
+        @media (max-width: 768px) {
+            .video-header {
+                padding: 1rem;
+            }
+            
+            .video-footer {
+                padding: 1rem;
+            }
+            
+            .film-title {
+                font-size: 1.8rem;
+            }
+            
+            .film-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <!-- Video Player -->
+        {% if film.video_file %}
+        <video
+            id="film-player"
+            class="video-js video-player"
+            controls
+            preload="auto"
+            data-setup='{"fluid": true, "responsive": true}'
+            poster="{% if film.backdrop %}{{ film.backdrop.url }}{% endif %}">
+            <source src="{{ film.video_file.url }}" type="video/mp4">
+            <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a web browser that 
+                <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>.
+            </p>
+        </video>
+        {% else %}
+        <!-- No video available -->
+        <div class="d-flex align-items-center justify-content-center h-100 bg-dark">
+            <div class="text-center">
+                <i class="fas fa-video-slash fa-5x text-muted mb-3"></i>
+                <h3 class="text-muted">Video not available</h3>
+                <p class="text-muted">This film doesn't have a video file uploaded yet.</p>
+                <a href="{% url 'films:film_detail' film.slug %}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Film Details
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Video Overlay -->
+        {% if film.video_file %}
+        <div class="video-overlay"></div>
+        
+        <!-- Video Header -->
+        <div class="video-header">
+            <a href="{% url 'films:film_detail' film.slug %}" class="back-button">
+                <i class="fas fa-arrow-left me-2"></i>Back
+            </a>
+            <div class="film-title-header">{{ film.title }}</div>
+            <div></div>
+        </div>
+        
+        <!-- Video Footer -->
+        <div class="video-footer">
+            <div class="film-info">
+                <h1 class="film-title">{{ film.title }}</h1>
+                <div class="film-meta">
+                    <span><i class="fas fa-calendar me-1"></i>{{ film.release_date.year }}</span>
+                    <span><i class="fas fa-clock me-1"></i>{{ film.duration }} min</span>
+                    <span><i class="fas fa-star me-1"></i>{{ film.rating }}</span>
+                    <span><i class="fas fa-user me-1"></i>{{ film.director }}</span>
+                </div>
+                <p class="film-description">{{ film.description|truncatewords:25 }}</p>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary toggle-watchlist" data-film-id="{{ film.id }}">
+                        <i class="fas fa-plus me-2"></i>Add to My List
+                    </button>
+                    <a href="{% url 'films:film_detail' film.slug %}" class="btn btn-secondary">
+                        <i class="fas fa-info-circle me-2"></i>More Info
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recommendations Section -->
+    {% if recommended_films %}
+    <section class="recommendations">
+        <div class="container">
+            <h2 class="section-title">More Like This</h2>
+            <div class="film-scroll">
+                {% for rec_film in recommended_films %}
+                <div class="film-card" onclick="location.href='{% url 'films:film_detail' rec_film.slug %}'">
+                    {% if rec_film.poster %}
+                    <img src="{{ rec_film.poster.url }}" alt="{{ rec_film.title }}" class="film-poster">
+                    {% else %}
+                    <div class="film-poster bg-secondary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-film fa-2x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="film-card-info">
+                        <h3 class="film-card-title">{{ rec_film.title }}</h3>
+                        <div class="film-card-meta">{{ rec_film.director }} • {{ rec_film.release_date.year }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Video.js -->
+    <script src="https://vjs.zencdn.net/8.0.4/video.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize video player if video exists
+            {% if film.video_file %}
+            const player = videojs('film-player', {
+                fluid: true,
+                responsive: true,
+                playbackRates: [0.5, 1, 1.25, 1.5, 2],
+                controls: true,
+                preload: 'auto'
+            });
+
+            // Auto-hide controls
+            let controlsTimeout;
+            const videoContainer = document.querySelector('.video-container');
+            const videoHeader = document.querySelector('.video-header');
+            const videoFooter = document.querySelector('.video-footer');
+
+            function showControls() {
+                videoHeader.style.opacity = '1';
+                videoFooter.style.opacity = '1';
+                document.body.style.cursor = 'default';
+                
+                clearTimeout(controlsTimeout);
+                controlsTimeout = setTimeout(hideControls, 3000);
+            }
+
+            function hideControls() {
+                if (!player.paused()) {
+                    videoHeader.style.opacity = '0';
+                    videoFooter.style.opacity = '0';
+                    document.body.style.cursor = 'none';
+                }
+            }
+
+            videoContainer.addEventListener('mousemove', showControls);
+            videoContainer.addEventListener('click', function() {
+                if (player.paused()) {
+                    player.play();
+                } else {
+                    player.pause();
+                }
+            });
+
+            player.on('play', function() {
+                setTimeout(hideControls, 3000);
+            });
+
+            player.on('pause', showControls);
+
+            // Show controls initially
+            showControls();
+            {% endif %}
+
+            // Watchlist toggle
+            document.querySelectorAll('.toggle-watchlist').forEach(button => {
+                button.addEventListener('click', function() {
+                    const filmId = this.getAttribute('data-film-id');
+                    
+                    fetch('{% url "films:toggle_watchlist" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: 'film_id=' + filmId
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const icon = this.querySelector('i');
+                        if (data.in_watchlist) {
+                            icon.className = 'fas fa-check me-2';
+                            this.innerHTML = '<i class="fas fa-check me-2"></i>Added to List';
+                        } else {
+                            icon.className = 'fas fa-plus me-2';
+                            this.innerHTML = '<i class="fas fa-plus me-2"></i>Add to My List';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                {% if film.video_file %}
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    if (player.paused()) {
+                        player.play();
+                    } else {
+                        player.pause();
+                    }
+                }
+                
+                if (e.code === 'Escape') {
+                    window.history.back();
+                }
+                
+                if (e.code === 'ArrowLeft') {
+                    e.preventDefault();
+                    player.currentTime(player.currentTime() - 10);
+                }
+                
+                if (e.code === 'ArrowRight') {
+                    e.preventDefault();
+                    player.currentTime(player.currentTime() + 10);
+                }
+                {% endif %}
+            });
+        });
+    </script>
+</body>
+</html>

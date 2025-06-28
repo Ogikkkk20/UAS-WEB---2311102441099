@@ -1,0 +1,562 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamFlix - Watch Movies Online</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* Netflix-style Header */
+        .main-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+            transition: all 0.3s ease;
+            padding: 1rem 0;
+        }
+        
+        .main-header.scrolled {
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .brand {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e50914;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: #e50914;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('{% if featured_film.backdrop %}{{ featured_film.backdrop.url }}{% else %}https://images.unsplash.com/photo-1489599809927-48f5b3b5ee00{% endif %}');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+        
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: #e50914;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #f40612;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+        }
+        
+        /* Film Sections */
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+        
+        .film-row {
+            margin-bottom: 3rem;
+        }
+        
+        .film-scroll {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .film-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .film-card {
+            min-width: 280px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .film-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .film-poster {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .film-info {
+            padding: 1rem;
+        }
+        
+        .film-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        
+        .film-meta {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+        
+        .film-rating {
+            background: #e50914;
+            color: #fff;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* Footer */
+        .main-footer {
+            background: #111;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid #333;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h5 {
+            color: #e50914;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section ul li a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section ul li a:hover {
+            color: #fff;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .film-card {
+                min-width: 200px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header" id="mainHeader">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{% url 'films:streaming_home' %}" class="brand">StreamFlix</a>
+                
+                <ul class="nav-links">
+                    <li><a href="{% url 'films:streaming_home' %}">Home</a></li>
+                    <li><a href="{% url 'films:film_list' %}">Movies</a></li>
+                    <li><a href="{% url 'films:search_films' %}">Search</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'films:watchlist' %}">My List</a></li>
+                    {% if user.is_staff %}
+                    <li><a href="/dashboard/">Admin</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                
+                <!-- Mobile Menu Button -->
+                <button class="btn btn-outline-light d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                {% if featured_film %}
+                <h1 class="hero-title">{{ featured_film.title }}</h1>
+                <p class="hero-description">{{ featured_film.description|truncatewords:30 }}</p>
+                <div class="cta-buttons">
+                    {% if featured_film.video_file %}
+                    <a href="{% url 'films:watch_film' featured_film.slug %}" class="btn btn-primary">
+                        <i class="fas fa-play me-2"></i>Play Now
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'films:film_detail' featured_film.slug %}" class="btn btn-secondary">
+                        <i class="fas fa-info-circle me-2"></i>More Info
+                    </a>
+                    <button class="btn btn-secondary toggle-watchlist" data-film-id="{{ featured_film.id }}">
+                        <i class="fas fa-plus me-2"></i>My List
+                    </button>
+                </div>
+                {% else %}
+                <h1 class="hero-title">Welcome to StreamFlix</h1>
+                <p class="hero-description">Discover and watch thousands of movies and TV shows. Stream anywhere, anytime.</p>
+                <div class="cta-buttons">
+                    <a href="{% url 'films:film_list' %}" class="btn btn-primary">
+                        <i class="fas fa-play me-2"></i>Start Watching
+                    </a>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'login' %}" class="btn btn-secondary">
+                        <i class="fas fa-user me-2"></i>Sign In
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <main class="container my-5">
+        <!-- Featured Films -->
+        {% if featured_films %}
+        <div class="film-row">
+            <h2 class="section-title">Featured Movies</h2>
+            <div class="film-scroll">
+                {% for film in featured_films %}
+                <div class="film-card" onclick="location.href='{% url 'films:film_detail' film.slug %}'">
+                    {% if film.poster %}
+                    <img src="{{ film.poster.url }}" alt="{{ film.title }}" class="film-poster">
+                    {% else %}
+                    <div class="film-poster bg-secondary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-film fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="film-info">
+                        <h3 class="film-title">{{ film.title }}</h3>
+                        <div class="film-meta">{{ film.director }} • {{ film.release_date.year }}</div>
+                        <span class="film-rating">{{ film.rating }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Popular Films -->
+        {% if popular_films %}
+        <div class="film-row">
+            <h2 class="section-title">Popular Movies</h2>
+            <div class="film-scroll">
+                {% for film in popular_films %}
+                <div class="film-card" onclick="location.href='{% url 'films:film_detail' film.slug %}'">
+                    {% if film.poster %}
+                    <img src="{{ film.poster.url }}" alt="{{ film.title }}" class="film-poster">
+                    {% else %}
+                    <div class="film-poster bg-secondary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-film fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="film-info">
+                        <h3 class="film-title">{{ film.title }}</h3>
+                        <div class="film-meta">{{ film.director }} • {{ film.release_date.year }}</div>
+                        <span class="film-rating">{{ film.rating }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Films -->
+        {% if recent_films %}
+        <div class="film-row">
+            <h2 class="section-title">Recently Added</h2>
+            <div class="film-scroll">
+                {% for film in recent_films %}
+                <div class="film-card" onclick="location.href='{% url 'films:film_detail' film.slug %}'">
+                    {% if film.poster %}
+                    <img src="{{ film.poster.url }}" alt="{{ film.title }}" class="film-poster">
+                    {% else %}
+                    <div class="film-poster bg-secondary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-film fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="film-info">
+                        <h3 class="film-title">{{ film.title }}</h3>
+                        <div class="film-meta">{{ film.director }} • {{ film.release_date.year }}</div>
+                        <span class="film-rating">{{ film.rating }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Films by Genre -->
+        {% for genre_data in genres_with_films %}
+        <div class="film-row">
+            <h2 class="section-title">{{ genre_data.genre.name }} Movies</h2>
+            <div class="film-scroll">
+                {% for film in genre_data.films %}
+                <div class="film-card" onclick="location.href='{% url 'films:film_detail' film.slug %}'">
+                    {% if film.poster %}
+                    <img src="{{ film.poster.url }}" alt="{{ film.title }}" class="film-poster">
+                    {% else %}
+                    <div class="film-poster bg-secondary d-flex align-items-center justify-content-center">
+                        <i class="fas fa-film fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    <div class="film-info">
+                        <h3 class="film-title">{{ film.title }}</h3>
+                        <div class="film-meta">{{ film.director }} • {{ film.release_date.year }}</div>
+                        <span class="film-rating">{{ film.rating }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h5>StreamFlix</h5>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h5>Support</h5>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h5>Connect</h5>
+                    <ul>
+                        <li><a href="#"><i class="fab fa-facebook me-2"></i>Facebook</a></li>
+                        <li><a href="#"><i class="fab fa-twitter me-2"></i>Twitter</a></li>
+                        <li><a href="#"><i class="fab fa-instagram me-2"></i>Instagram</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center mt-4 pt-4" style="border-top: 1px solid #333;">
+                <p class="text-muted">&copy; 2025 StreamFlix. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Menu -->
+    <div class="offcanvas offcanvas-end bg-dark text-white" tabindex="-1" id="mobileMenu">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title text-danger">StreamFlix</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="list-unstyled">
+                <li class="mb-3"><a href="{% url 'films:streaming_home' %}" class="text-white text-decoration-none">Home</a></li>
+                <li class="mb-3"><a href="{% url 'films:film_list' %}" class="text-white text-decoration-none">Movies</a></li>
+                <li class="mb-3"><a href="{% url 'films:search_films' %}" class="text-white text-decoration-none">Search</a></li>
+                {% if user.is_authenticated %}
+                <li class="mb-3"><a href="{% url 'films:watchlist' %}" class="text-white text-decoration-none">My List</a></li>
+                {% if user.is_staff %}
+                <li class="mb-3"><a href="/dashboard/" class="text-white text-decoration-none">Admin</a></li>
+                {% endif %}
+                <li class="mb-3"><a href="{% url 'logout' %}" class="text-white text-decoration-none">Logout</a></li>
+                {% else %}
+                <li class="mb-3"><a href="{% url 'login' %}" class="text-white text-decoration-none">Login</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('mainHeader');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Watchlist toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.toggle-watchlist').forEach(button => {
+                button.addEventListener('click', function() {
+                    const filmId = this.getAttribute('data-film-id');
+                    
+                    fetch('{% url "films:toggle_watchlist" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: 'film_id=' + filmId
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const icon = this.querySelector('i');
+                        if (data.in_watchlist) {
+                            icon.className = 'fas fa-check me-2';
+                            this.innerHTML = '<i class="fas fa-check me-2"></i>Added';
+                        } else {
+                            icon.className = 'fas fa-plus me-2';
+                            this.innerHTML = '<i class="fas fa-plus me-2"></i>My List';
+                        }
+                        
+                        // Show notification
+                        showNotification(data.message);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+        });
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-success position-fixed';
+            notification.style.top = '100px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '9999';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

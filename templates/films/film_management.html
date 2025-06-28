@@ -1,0 +1,267 @@
+{% extends 'films/base.html' %}
+
+{% block title %}Film Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-6 fw-bold">
+        <i class="fas fa-film me-3"></i>Film Management
+    </h1>
+    <a href="{% url 'films:film_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Add New Film
+    </a>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h3 class="fw-bold mb-1">{{ stats.total }}</h3>
+            <small>Total Films</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h3 class="fw-bold mb-1">{{ stats.published }}</h3>
+            <small>Published</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h3 class="fw-bold mb-1">{{ stats.draft }}</h3>
+            <small>Drafts</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card">
+            <h3 class="fw-bold mb-1">{{ stats.featured }}</h3>
+            <small>Featured</small>
+        </div>
+    </div>
+</div>
+
+<!-- Search and Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <form method="GET" class="d-flex gap-3 align-items-end">
+            <div class="flex-grow-1">
+                <label class="form-label">Search Films</label>
+                <div class="search-bar">
+                    <div class="input-group">
+                        <span class="input-group-text border-0 bg-transparent">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control border-0" 
+                               name="search" value="{{ search_form.search.value|default_if_none:'' }}" 
+                               placeholder="Search by title, director, or cast...">
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label class="form-label">Genre</label>
+                {{ search_form.genre }}
+            </div>
+            <div>
+                <label class="form-label">Rating</label>
+                {{ search_form.rating }}
+            </div>
+            <div>
+                <label class="form-label">Status</label>
+                {{ search_form.status }}
+            </div>
+            <div>
+                <label class="form-label">Sort By</label>
+                {{ search_form.sort_by }}
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Films Table -->
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th width="60">Poster</th>
+                <th>Film Details</th>
+                <th width="100">Status</th>
+                <th width="80">Featured</th>
+                <th width="80">Views</th>
+                <th width="100">Created</th>
+                <th width="150">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for film in page_obj %}
+            <tr>
+                <td>
+                    {% if film.poster %}
+                        <img src="{{ film.poster.url }}" alt="{{ film.title }}" 
+                             class="img-thumbnail" style="width: 50px; height: 75px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" 
+                             style="width: 50px; height: 75px; border-radius: 5px;">
+                            <i class="fas fa-film text-muted"></i>
+                        </div>
+                    {% endif %}
+                </td>
+                <td>
+                    <div>
+                        <h6 class="mb-1 fw-bold">{{ film.title }}</h6>
+                        <small class="text-muted">Director: {{ film.director }}</small><br>
+                        <small class="text-muted">{{ film.release_date|date:"Y" }} • {{ film.duration }} min • {{ film.get_rating_display }}</small><br>
+                        {% for genre in film.genres.all %}
+                            <span class="genre-tag">{{ genre.name }}</span>
+                        {% endfor %}
+                        {% if film.imdb_rating %}
+                            <br><small class="text-warning">
+                                <i class="fas fa-star"></i> {{ film.imdb_rating }}/10
+                            </small>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <button class="btn btn-sm status-btn" 
+                            onclick="toggleStatus({{ film.id }})" 
+                            data-film-id="{{ film.id }}">
+                        {% if film.status == 'published' %}
+                            <span class="badge bg-success">{{ film.get_status_display }}</span>
+                        {% elif film.status == 'draft' %}
+                            <span class="badge bg-warning">{{ film.get_status_display }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ film.get_status_display }}</span>
+                        {% endif %}
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-sm" onclick="toggleFeatured({{ film.id }})" data-film-id="{{ film.id }}">
+                        {% if film.featured %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-muted"></i>
+                        {% endif %}
+                    </button>
+                </td>
+                <td>
+                    <small class="text-muted">{{ film.views_count }}</small>
+                </td>
+                <td>
+                    <small class="text-muted">{{ film.created_at|date:"M d, Y" }}</small>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'films:film_detail' film.slug %}" 
+                           class="btn btn-sm btn-outline-primary" target="_blank" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'films:film_edit' film.id %}" 
+                           class="btn btn-sm btn-outline-secondary" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'films:film_delete' film.id %}" 
+                           class="btn btn-sm btn-outline-danger" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center py-5">
+                    <i class="fas fa-film fa-3x text-muted mb-3"></i>
+                    <h5>No films found</h5>
+                    <p class="text-muted">Start by creating your first film or adjust your search filters.</p>
+                    <a href="{% url 'films:film_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Your First Film
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Film pagination" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">Previous</a>
+            </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleStatus(filmId) {
+    fetch(`/films/management/toggle-status/${filmId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error updating status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+}
+
+function toggleFeatured(filmId) {
+    fetch(`/films/management/toggle-featured/${filmId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error updating featured status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+}
+</script>
+{% endblock %}

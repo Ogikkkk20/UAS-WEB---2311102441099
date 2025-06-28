@@ -1,0 +1,248 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <!-- Navbar -->
+  <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+    <div class="container-fluid py-1 px-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+          <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="{% url 'films:streaming_home' %}">Home</a></li>
+          <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Search</li>
+        </ol>
+        <h6 class="font-weight-bolder mb-0">Search Films</h6>
+      </nav>
+    </div>
+  </nav>
+  <!-- End Navbar -->
+
+  <div class="container-fluid py-4">
+    <!-- Search Form -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <form method="get" class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" class="form-control" name="q" value="{{ search_params.q }}" placeholder="Title, director, cast...">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Genre</label>
+                <select class="form-select" name="genre">
+                  <option value="">All Genres</option>
+                  {% for genre in genres %}
+                  <option value="{{ genre.id }}" {% if search_params.genre == genre.id|stringformat:"s" %}selected{% endif %}>{{ genre.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Rating</label>
+                <select class="form-select" name="rating">
+                  <option value="">All Ratings</option>
+                  <option value="G" {% if search_params.rating == "G" %}selected{% endif %}>G</option>
+                  <option value="PG" {% if search_params.rating == "PG" %}selected{% endif %}>PG</option>
+                  <option value="PG-13" {% if search_params.rating == "PG-13" %}selected{% endif %}>PG-13</option>
+                  <option value="R" {% if search_params.rating == "R" %}selected{% endif %}>R</option>
+                  <option value="NC-17" {% if search_params.rating == "NC-17" %}selected{% endif %}>NC-17</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Year</label>
+                <input type="number" class="form-control" name="year" value="{{ search_params.year }}" placeholder="2024" min="1900" max="2030">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Sort By</label>
+                <select class="form-select" name="sort">
+                  <option value="-created_at" {% if search_params.sort == "-created_at" %}selected{% endif %}>Newest</option>
+                  <option value="created_at" {% if search_params.sort == "created_at" %}selected{% endif %}>Oldest</option>
+                  <option value="title" {% if search_params.sort == "title" %}selected{% endif %}>Title A-Z</option>
+                  <option value="-title" {% if search_params.sort == "-title" %}selected{% endif %}>Title Z-A</option>
+                  <option value="release_date" {% if search_params.sort == "release_date" %}selected{% endif %}>Release Date</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary">
+                  <i class="material-icons me-1">search</i>Search
+                </button>
+                <a href="{% url 'films:search_films' %}" class="btn btn-outline-secondary ms-2">Clear</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    {% if search_params.q or search_params.genre or search_params.rating or search_params.year %}
+    <div class="row mb-3">
+      <div class="col-12">
+        <h6 class="mb-0">{{ total_results }} result{{ total_results|pluralize }} found</h6>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if page_obj.object_list %}
+    <div class="row">
+      {% for film in page_obj.object_list %}
+      <div class="col-xl-2 col-md-3 col-sm-4 col-6 mb-4">
+        <div class="card h-100 card-hover">
+          <div class="card-header p-0 position-relative">
+            {% if film.poster %}
+            <img src="{{ film.poster.url }}" class="w-100 border-radius-lg" style="height: 300px; object-fit: cover;" alt="{{ film.title }}">
+            {% else %}
+            <div class="bg-gradient-dark w-100 border-radius-lg d-flex align-items-center justify-content-center" style="height: 300px;">
+              <i class="material-icons text-white" style="font-size: 3rem;">movie</i>
+            </div>
+            {% endif %}
+            <div class="position-absolute top-0 end-0 m-2">
+              <span class="badge bg-gradient-warning">{{ film.rating }}</span>
+            </div>
+            <div class="position-absolute top-0 start-0 m-2">
+              <button class="btn btn-sm btn-light toggle-watchlist" data-film-id="{{ film.id }}">
+                <i class="material-icons">bookmark_border</i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body p-3">
+            <h6 class="mb-1">{{ film.title }}</h6>
+            <p class="text-sm text-muted mb-1">{{ film.director }}</p>
+            <p class="text-xs text-muted mb-2">{{ film.release_date.year }}</p>
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'films:film_detail' film.slug %}" class="btn btn-outline-primary btn-sm">Details</a>
+              {% if film.video_file %}
+              <a href="{% url 'films:watch_film' film.slug %}" class="btn btn-primary btn-sm">Watch</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="row mt-4">
+      <div class="col-12 d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body text-center py-5">
+            <i class="material-icons text-muted mb-3" style="font-size: 4rem;">search_off</i>
+            <h4 class="text-muted mb-3">No films found</h4>
+            <p class="text-muted mb-4">Try adjusting your search criteria or browse all films.</p>
+            <a href="{% url 'films:film_list' %}" class="btn btn-primary">
+              <i class="material-icons me-1">movie</i>Browse All Films
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</main>
+
+<style>
+.card-hover {
+  transition: transform 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Watchlist toggle functionality
+    document.querySelectorAll('.toggle-watchlist').forEach(button => {
+        button.addEventListener('click', function() {
+            const filmId = this.getAttribute('data-film-id');
+            const icon = this.querySelector('i');
+            
+            fetch('{% url "films:toggle_watchlist" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: 'film_id=' + filmId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.in_watchlist) {
+                    icon.textContent = 'bookmark';
+                    this.classList.remove('btn-light');
+                    this.classList.add('btn-warning');
+                } else {
+                    icon.textContent = 'bookmark_border';
+                    this.classList.remove('btn-warning');
+                    this.classList.add('btn-light');
+                }
+                showNotification(data.message, 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error updating watchlist', 'error');
+            });
+        });
+    });
+});
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

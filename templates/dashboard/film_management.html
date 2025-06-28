@@ -1,0 +1,306 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <!-- Navbar -->
+  <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+    <div class="container-fluid py-1 px-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+          <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="/dashboard/">Dashboard</a></li>
+          <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Film Management</li>
+        </ol>
+        <h6 class="font-weight-bolder mb-0">Film Management</h6>
+      </nav>
+      <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+        <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+          <a href="{% url 'films:film_create' %}" class="btn btn-success btn-sm">
+            <i class="material-icons text-sm">add</i>&nbsp;&nbsp;Add New Film
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- End Navbar -->
+
+  <div class="container-fluid py-4">
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">movie</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Total Films</p>
+              <h4 class="mb-0">{{ stats.total }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">visibility</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Published</p>
+              <h4 class="mb-0">{{ stats.published }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">star</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Featured</p>
+              <h4 class="mb-0">{{ stats.featured }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-sm-6">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">edit</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Drafts</p>
+              <h4 class="mb-0">{{ stats.draft }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header pb-0">
+            <div class="d-lg-flex">
+              <div>
+                <h5 class="mb-0">Film Search & Filter</h5>
+                <p class="text-sm mb-0">
+                  Search and filter your films collection
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="card-body px-0 pb-0">
+            <form method="GET" class="px-3">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="input-group input-group-outline mb-3">
+                    <label class="form-label">Search films...</label>
+                    {{ search_form.search }}
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="input-group input-group-outline mb-3">
+                    <select class="form-control" name="genre">
+                      <option value="">All Genres</option>
+                      {% for choice in search_form.genre.field.choices %}
+                        {% if choice.0 %}
+                          <option value="{{ choice.0 }}" {% if search_form.genre.value == choice.0 %}selected{% endif %}>
+                            {{ choice.1 }}
+                          </option>
+                        {% endif %}
+                      {% endfor %}
+                    </select>
+                    <label class="form-label">Genre</label>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="input-group input-group-outline mb-3">
+                    <select class="form-control" name="status">
+                      <option value="">All Status</option>
+                      <option value="published" {% if search_form.status.value == 'published' %}selected{% endif %}>Published</option>
+                      <option value="draft" {% if search_form.status.value == 'draft' %}selected{% endif %}>Draft</option>
+                    </select>
+                    <label class="form-label">Status</label>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <button type="submit" class="btn btn-primary w-100">
+                    <i class="material-icons">search</i> Search
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Films Table -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card my-4">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+              <h6 class="text-white text-capitalize ps-3">Films Management</h6>
+            </div>
+          </div>
+          <div class="card-body px-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Film</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Details</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Rating</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Featured</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for film in page_obj %}
+                  <tr>
+                    <td>
+                      <div class="d-flex px-2 py-1">
+                        <div>
+                          {% if film.poster %}
+                            <img src="{{ film.poster.url }}" class="avatar avatar-sm me-3 border-radius-lg" alt="film poster">
+                          {% else %}
+                            <div class="avatar avatar-sm me-3 border-radius-lg bg-gradient-secondary d-flex align-items-center justify-content-center">
+                              <i class="material-icons opacity-10">movie</i>
+                            </div>
+                          {% endif %}
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                          <h6 class="mb-0 text-sm">{{ film.title }}</h6>
+                          <p class="text-xs text-secondary mb-0">{{ film.director }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ film.release_date|date:"Y" }}</p>
+                      <p class="text-xs text-secondary mb-0">{{ film.duration }} min | {{ film.rating }}</p>
+                    </td>
+                    <td class="align-middle text-center text-sm">
+                      {% if film.status == 'published' %}
+                        <span class="badge badge-sm bg-gradient-success">Published</span>
+                      {% else %}
+                        <span class="badge badge-sm bg-gradient-secondary">Draft</span>
+                      {% endif %}
+                    </td>
+                    <td class="align-middle text-center">
+                      <span class="text-secondary text-xs font-weight-bold">
+                        {% if film.imdb_rating %}
+                          <i class="material-icons text-warning">star</i> {{ film.imdb_rating }}
+                        {% else %}
+                          N/A
+                        {% endif %}
+                      </span>
+                    </td>
+                    <td class="align-middle text-center">
+                      {% if film.featured %}
+                        <i class="material-icons text-success">star</i>
+                      {% else %}
+                        <i class="material-icons text-secondary">star_outline</i>
+                      {% endif %}
+                    </td>
+                    <td class="align-middle text-center">
+                      <div class="btn-group" role="group">
+                        <a href="{% url 'films:film_edit' film.id %}" class="btn btn-link text-dark px-2 mb-0" title="Edit">
+                          <i class="material-icons text-sm">edit</i>
+                        </a>
+                        <a href="{% url 'films:toggle_film_status' film.id %}" class="btn btn-link text-dark px-2 mb-0" title="Toggle Status">
+                          <i class="material-icons text-sm">visibility</i>
+                        </a>
+                        <a href="{% url 'films:toggle_film_featured' film.id %}" class="btn btn-link text-dark px-2 mb-0" title="Toggle Featured">
+                          <i class="material-icons text-sm">star</i>
+                        </a>
+                        <a href="{% url 'films:film_delete' film.id %}" class="btn btn-link text-danger px-2 mb-0" title="Delete" onclick="return confirm('Are you sure you want to delete this film?')">
+                          <i class="material-icons text-sm">delete</i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="6" class="text-center py-4">
+                      <div class="text-center">
+                        <i class="material-icons text-secondary" style="font-size: 3rem;">movie_filter</i>
+                        <h6 class="text-secondary mt-2">No films found</h6>
+                        <p class="text-xs text-secondary">Try adjusting your search criteria or add a new film</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                      <i class="material-icons">first_page</i>
+                    </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                      <i class="material-icons">chevron_left</i>
+                    </a>
+                  </li>
+                {% endif %}
+
+                {% for page_num in page_obj.paginator.page_range %}
+                  {% if page_num == page_obj.number %}
+                    <li class="page-item active">
+                      <span class="page-link">{{ page_num }}</span>
+                    </li>
+                  {% elif page_num > page_obj.number|add:'-3' and page_num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ page_num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">{{ page_num }}</a>
+                    </li>
+                  {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                      <i class="material-icons">chevron_right</i>
+                    </a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.genre %}&genre={{ request.GET.genre }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">
+                      <i class="material-icons">last_page</i>
+                    </a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

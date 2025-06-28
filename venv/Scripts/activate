@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\OGI FEBRIAN\tes_django\venv"
+VIRTUAL_ENV="C:\Users\nazri\OneDrive\Desktop\joki uas\2311102441099-Ogi-Febrian-Saputra\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

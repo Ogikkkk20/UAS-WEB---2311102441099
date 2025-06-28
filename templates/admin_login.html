@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamFlix - Admin Login</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+        }
+        
+        .login-card {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #e50914;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-subtitle {
+            color: #888;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+        
+        .form-label {
+            color: #fff;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #e50914;
+            box-shadow: 0 0 0 0.2rem rgba(229, 9, 20, 0.25);
+            color: #fff;
+        }
+        
+        .form-control::placeholder {
+            color: #888;
+        }
+        
+        .btn-login {
+            background: #e50914;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .btn-login:hover {
+            background: #f40612;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
+        }
+        
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .back-link {
+            color: #888;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            margin-top: 1.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .back-link:hover {
+            color: #e50914;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(45deg, #e50914, #ff6b00);
+            color: #fff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .features-list {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+        
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .features-list li::before {
+            content: "✓";
+            color: #e50914;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <h1 class="brand">StreamFlix</h1>
+            <div class="text-center">
+                <span class="admin-badge">Admin Portal</span>
+            </div>
+            <p class="login-subtitle">Login to manage your streaming platform</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="fas fa-user me-2"></i>Username
+                    </label>
+                    <input type="text" class="form-control" id="username" name="username" 
+                           placeholder="Enter your username" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Password
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password" 
+                           placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login to Admin
+                </button>
+            </form>
+            
+            <div class="features-list">
+                <p class="text-center"><strong>Admin Features:</strong></p>
+                <ul>
+                    <li>Upload & manage films</li>
+                    <li>Video file support</li>
+                    <li>User management</li>
+                    <li>Analytics dashboard</li>
+                    <li>Content moderation</li>
+                </ul>
+            </div>
+            
+            <a href="{% url 'films:streaming_home' %}" class="back-link">
+                <i class="fas fa-arrow-left me-2"></i>Back to StreamFlix
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-focus username field
+        document.getElementById('username').focus();
+        
+        // Add some animation on form submission
+        document.querySelector('form').addEventListener('submit', function() {
+            const button = document.querySelector('.btn-login');
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+            button.disabled = true;
+        });
+    </script>
+</body>
+</html>

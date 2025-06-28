@@ -13,53 +13,126 @@
         <li class="nav-item mb-2 mt-0">
           <a data-bs-toggle="collapse" href="#ProfileNav" class="nav-link text-white" aria-controls="ProfileNav" role="button" aria-expanded="false">
             <img src="{% static 'dashboard/assets/img/team-3.jpg'%}" class="avatar">
-            <span class="nav-link-text ms-2 ps-1">Brooklyn Alice</span>
+            <span class="nav-link-text ms-2 ps-1">Ogi Febrian Saputra</span>
           </a>
+        </li>
         <hr class="horizontal light mt-0">
+        
         <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#dashboardsExamples" class="nav-link text-white active" aria-controls="dashboardsExamples" role="button" aria-expanded="false">
-            <i class="material-icons-round opacity-10">dashboard</i>
-            <span class="nav-link-text ms-2 ps-1">Dashboards</span>
+          <a href="{% url 'films:streaming_home' %}" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">home</i>
+            <span class="nav-link-text ms-2 ps-1">Streaming Home</span>
           </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="{% url 'films:film_list' %}" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">video_library</i>
+            <span class="nav-link-text ms-2 ps-1">Browse Films</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="{% url 'films:watchlist' %}" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">bookmark</i>
+            <span class="nav-link-text ms-2 ps-1">My Watchlist</span>
+          </a>
+        </li>
         
         <li class="nav-item mt-3">
-          <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder text-white">PAGES</h6>
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder text-white">MANAGEMENT</h6>
         </li>
-        <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#dashboardsExamples" class="nav-link text-white active" aria-controls="dashboardsExamples" role="button" aria-expanded="false">
-            <i class="material-icons-round opacity-10">dashboard</i>
-            <span class="nav-link-text ms-2 ps-1">Dashboards</span>
-          </a>
         
         <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#applicationsExamples" class="nav-link text-white " aria-controls="applicationsExamples" role="button" aria-expanded="false">
-            <i class="material-icons-round {% if page.brand == 'RTL' %}ms-2{% else %} me-2{% endif %}">apps</i>
-            <span class="nav-link-text ms-2 ps-1">Applications</span>
+          <a data-bs-toggle="collapse" href="#filmManagement" class="nav-link text-white" aria-controls="filmManagement" role="button" aria-expanded="false">
+            <i class="material-icons-round me-2">movie</i>
+            <span class="nav-link-text ms-2 ps-1">Film Management</span>
           </a>
-        <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#ecommerceExamples" class="nav-link text-white " aria-controls="ecommerceExamples" role="button" aria-expanded="false">
-            <i class="material-icons-round {% if page.brand == 'RTL' %}ms-2{% else %} me-2{% endif %}">shopping_basket</i>
-            <span class="nav-link-text ms-2 ps-1">Ecommerce</span>
-          </a>
-        <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#authExamples" class="nav-link text-white " aria-controls="authExamples" role="button" aria-expanded="false">
-            <i class="material-icons-round {% if page.brand == 'RTL' %}ms-2{% else %} me-2{% endif %}">content_paste</i>
-            <span class="nav-link-text ms-2 ps-1">Authentication</span>
-          </a>
-        <li class="nav-item">
-          <hr class="horizontal light" />
-          <h6 class="ps-4  ms-2 text-uppercase text-xs font-weight-bolder text-white">DOCS</h6>
+          <div class="collapse" id="filmManagement">
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'films:film_management' %}">
+                  <span class="sidenav-mini-icon">D</span>
+                  <span class="sidenav-normal ms-2 ps-1">Dashboard</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'films:film_create' %}">
+                  <span class="sidenav-mini-icon">+</span>
+                  <span class="sidenav-normal ms-2 ps-1">Add Film</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'films:genre_management' %}">
+                  <span class="sidenav-mini-icon">G</span>
+                  <span class="sidenav-normal ms-2 ps-1">Manage Genres</span>
+                </a>
+              </li>
+            </ul>
+          </div>
         </li>
+        
         <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#basicExamples" class="nav-link text-white " aria-controls="basicExamples" role="button" aria-expanded="false">
-            <i class="material-icons-round {% if page.brand == 'RTL' %}ms-2{% else %} me-2{% endif %}">upcoming</i>
-            <span class="nav-link-text ms-2 ps-1">Basic</span>
+          <a data-bs-toggle="collapse" href="#userManagement" class="nav-link text-white" aria-controls="userManagement" role="button" aria-expanded="false">
+            <i class="material-icons-round me-2">people</i>
+            <span class="nav-link-text ms-2 ps-1">User Management</span>
           </a>
+          <div class="collapse" id="userManagement">
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'user_management' %}">
+                  <span class="sidenav-mini-icon">U</span>
+                  <span class="sidenav-normal ms-2 ps-1">Users Dashboard</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder text-white">ADMIN</h6>
+        </li>
+        
         <li class="nav-item">
-          <a data-bs-toggle="collapse" href="#componentsExamples" class="nav-link text-white " aria-controls="componentsExamples" role="button" aria-expanded="false">
-            <i class="material-icons-round {% if page.brand == 'RTL' %}ms-2{% else %} me-2{% endif %}">view_in_ar</i>
-            <span class="nav-link-text ms-2 ps-1">Components</span>
+          <a href="/admin/" class="nav-link text-white" target="_blank">
+            <i class="material-icons-round me-2">admin_panel_settings</i>
+            <span class="nav-link-text ms-2 ps-1">Django Admin</span>
           </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/database/" class="nav-link text-white">
+            <i class="material-icons-round me-2">storage</i>
+            <span class="nav-link-text ms-2 ps-1">Database View</span>
+          </a>
+        </li>
+        
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder text-white">ACCOUNT</h6>
+        </li>
+        
+        <li class="nav-item">
+          <a data-bs-toggle="collapse" href="#authExamples" class="nav-link text-white" aria-controls="authExamples" role="button" aria-expanded="false">
+            <i class="material-icons-round me-2">person</i>
+            <span class="nav-link-text ms-2 ps-1">Account</span>
+          </a>
+          <div class="collapse" id="authExamples">
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link text-white" href="javascript:;">
+                  <span class="sidenav-mini-icon">W</span>
+                  <span class="sidenav-normal ms-2 ps-1">Welcome, {{ user.username|default:"Guest" }}</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="{% url 'logout' %}">
+                  <span class="sidenav-mini-icon">L</span>
+                  <span class="sidenav-normal ms-2 ps-1">Logout</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
       </ul>
     </div>
   </aside>

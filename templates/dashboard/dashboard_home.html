@@ -1,0 +1,186 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <!-- Navbar -->
+  <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+    <div class="container-fluid py-1 px-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+          <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
+          <li class="breadcrumb-item text-sm text-dark active" aria-current="page">Dashboard</li>
+        </ol>
+        <h6 class="font-weight-bolder mb-0">Admin Dashboard</h6>
+      </nav>
+    </div>
+  </nav>
+  <!-- End Navbar -->
+
+  <div class="container-fluid py-4">
+    <!-- Welcome Card -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+              <h6 class="text-white text-capitalize ps-3">Welcome to Film Management System</h6>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="mb-3">Welcome to your Netflix-style streaming platform management dashboard.</p>
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Quick Actions:</h6>
+                <ul class="list-unstyled">
+                  <li><a href="{% url 'films:streaming_home' %}" class="text-primary"><i class="material-icons text-sm me-1">home</i>View Streaming Homepage</a></li>
+                  <li><a href="{% url 'films:film_management' %}" class="text-primary"><i class="material-icons text-sm me-1">movie</i>Manage Films</a></li>
+                  <li><a href="{% url 'user_management' %}" class="text-primary"><i class="material-icons text-sm me-1">people</i>Manage Users</a></li>
+                  <li><a href="/admin/" class="text-primary" target="_blank"><i class="material-icons text-sm me-1">admin_panel_settings</i>Django Admin</a></li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6>System Status:</h6>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge bg-success me-2">Active</span>
+                  <span class="text-sm">Film Streaming System</span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                  <span class="badge bg-success me-2">Online</span>
+                  <span class="text-sm">User Management</span>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="badge bg-success me-2">Ready</span>
+                  <span class="text-sm">Video Upload Support</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-dark shadow-dark text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">movie</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Total Films</p>
+              <h4 class="mb-0">{{ total_films|default:"0" }}</h4>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+3% </span>from last month</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-primary shadow-primary text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">people</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Total Users</p>
+              <h4 class="mb-0">{{ total_users|default:"0" }}</h4>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+5% </span>from last month</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-success shadow-success text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">play_circle</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Video Views</p>
+              <h4 class="mb-0">{{ total_views|default:"0" }}</h4>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+12% </span>from yesterday</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-xl-3 col-sm-6">
+        <div class="card">
+          <div class="card-header p-3 pt-2">
+            <div class="icon icon-lg icon-shape bg-gradient-info shadow-info text-center border-radius-xl mt-n4 position-absolute">
+              <i class="material-icons opacity-10">star</i>
+            </div>
+            <div class="text-end pt-1">
+              <p class="text-sm mb-0 text-capitalize">Reviews</p>
+              <h4 class="mb-0">{{ total_reviews|default:"0" }}</h4>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-3">
+            <p class="mb-0"><span class="text-success text-sm font-weight-bolder">+8% </span>from last week</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card my-4">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-secondary shadow-secondary border-radius-lg pt-4 pb-3">
+              <h6 class="text-white text-capitalize ps-3">Recent Activity</h6>
+            </div>
+          </div>
+          <div class="card-body px-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
+                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Type</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="d-flex px-2 py-1">
+                        <div class="d-flex flex-column justify-content-center">
+                          <h6 class="mb-0 text-sm">System initialized</h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p class="text-xs font-weight-bold mb-0">System</p>
+                    </td>
+                    <td class="align-middle text-center text-sm">
+                      <span class="badge badge-sm bg-gradient-success">Complete</span>
+                    </td>
+                    <td class="align-middle text-center">
+                      <span class="text-secondary text-xs font-weight-bold">Just now</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

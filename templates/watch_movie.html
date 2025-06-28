@@ -1,0 +1,488 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}{{ film.title }} - StreamFlix{% endblock %}
+
+{% block extra_css %}
+<style>
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    background: #000;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-container:hover .video-overlay {
+    opacity: 1;
+}
+
+.play-control {
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    font-size: 30px;
+    color: #333;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.play-control:hover {
+    transform: scale(1.1);
+}
+
+.movie-details {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.rating-stars {
+    color: #ffc107;
+}
+
+.genre-tag {
+    background: rgba(233, 30, 99, 0.2);
+    color: #e91e63;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin: 0 5px 5px 0;
+    display: inline-block;
+}
+
+.cast-member {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.cast-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.5rem;
+}
+
+.video-quality-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.video-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #e91e63;
+    width: 30%;
+    transition: width 0.3s ease;
+}
+
+.watchlist-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+.recommendations {
+    margin-top: 3rem;
+}
+
+.recommendation-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.recommendation-card:hover {
+    transform: scale(1.02);
+}
+
+.recommendation-poster {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Video Player Section -->
+    <div class="video-container">
+        {% if film.video_file %}
+            <video class="video-player" id="mainVideo" poster="{% if film.backdrop %}{{ film.backdrop.url }}{% elif film.poster %}{{ film.poster.url }}{% endif %}">
+                <source src="{{ film.video_file.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% elif film.video_url %}
+            <iframe class="video-player" src="{{ film.video_url }}" frameborder="0" allowfullscreen></iframe>
+        {% else %}
+            <div class="video-player d-flex align-items-center justify-content-center bg-dark">
+                <div class="text-center text-white">
+                    <i class="material-icons mb-3" style="font-size: 80px;">videocam_off</i>
+                    <h4>Video Not Available</h4>
+                    <p>This movie doesn't have a video file yet.</p>
+                    {% if user.is_staff %}
+                        <a href="/films/{{ film.slug }}/edit/" class="btn btn-primary">
+                            <i class="material-icons me-2">upload</i>
+                            Upload Video
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Video Overlay Controls -->
+        <div class="video-overlay" id="videoOverlay">
+            <button class="play-control" id="playBtn" onclick="togglePlay()">
+                <i class="material-icons" id="playIcon">play_arrow</i>
+            </button>
+        </div>
+        
+        <!-- Watchlist Button -->
+        <button class="btn btn-outline-light watchlist-btn" onclick="toggleWatchlist()">
+            <i class="material-icons me-2" id="watchlistIcon">bookmark_border</i>
+            <span id="watchlistText">Add to Watchlist</span>
+        </button>
+        
+        <!-- Quality Selector -->
+        <div class="video-quality-selector">
+            <select class="form-select form-select-sm">
+                <option value="auto">Auto</option>
+                <option value="1080p">1080p HD</option>
+                <option value="720p">720p HD</option>
+                <option value="480p">480p</option>
+            </select>
+        </div>
+        
+        <!-- Video Controls -->
+        <div class="video-controls" id="videoControls">
+            <button class="btn btn-sm text-white" onclick="togglePlay()">
+                <i class="material-icons" id="controlPlayIcon">play_arrow</i>
+            </button>
+            <button class="btn btn-sm text-white" onclick="toggleMute()">
+                <i class="material-icons" id="muteIcon">volume_up</i>
+            </button>
+            <div class="progress-bar" onclick="seek(event)">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="timeDisplay">00:00 / 00:00</span>
+            <button class="btn btn-sm text-white" onclick="toggleFullscreen()">
+                <i class="material-icons">fullscreen</i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Movie Information -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="movie-details">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h2 class="text-white mb-2">{{ film.title }}</h2>
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="text-muted me-3">{{ film.release_date.year }}</span>
+                            <span class="text-muted me-3">{{ film.duration }} min</span>
+                            <span class="badge bg-secondary me-3">{{ film.rating }}</span>
+                            {% if film.imdb_rating %}
+                            <div class="d-flex align-items-center">
+                                <div class="rating-stars me-2">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= film.imdb_rating %}
+                                            <i class="material-icons" style="font-size: 16px;">star</i>
+                                        {% else %}
+                                            <i class="material-icons" style="font-size: 16px;">star_border</i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <span class="text-white">{{ film.imdb_rating }}/10</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <div class="text-muted mb-2">Views</div>
+                        <div class="text-white h5">{{ film.views_count }}</div>
+                    </div>
+                </div>
+                
+                <!-- Genres -->
+                <div class="mb-3">
+                    {% for genre in film.genres.all %}
+                        <span class="genre-tag">{{ genre.name }}</span>
+                    {% endfor %}
+                </div>
+                
+                <!-- Description -->
+                <div class="mb-4">
+                    <h5 class="text-white mb-3">Synopsis</h5>
+                    <p class="text-light">{{ film.synopsis|default:film.description }}</p>
+                </div>
+                
+                <!-- Director and Cast -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-white">Director</h6>
+                        <p class="text-light">{{ film.director }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-white">Main Cast</h6>
+                        <p class="text-light">{{ film.cast }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Action Buttons -->
+            <div class="card bg-gradient-dark">
+                <div class="card-body">
+                    <h6 class="text-white mb-3">Actions</h6>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="togglePlay()">
+                            <i class="material-icons me-2">play_arrow</i>
+                            Watch Now
+                        </button>
+                        {% if film.trailer_url %}
+                        <a href="{{ film.trailer_url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="material-icons me-2">movie</i>
+                            Watch Trailer
+                        </a>
+                        {% endif %}
+                        <button class="btn btn-outline-secondary" onclick="shareMovie()">
+                            <i class="material-icons me-2">share</i>
+                            Share
+                        </button>
+                        <button class="btn btn-outline-info" onclick="downloadMovie()">
+                            <i class="material-icons me-2">download</i>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Movie Stats -->
+            <div class="card bg-gradient-secondary mt-3">
+                <div class="card-body">
+                    <h6 class="text-white mb-3">Statistics</h6>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="text-white h4">{{ film.views_count }}</div>
+                            <div class="text-xs text-uppercase">Views</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-white h4">{{ film.reviews.count }}</div>
+                            <div class="text-xs text-uppercase">Reviews</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-white h4">{{ film.imdb_rating|default:"N/A" }}</div>
+                            <div class="text-xs text-uppercase">Rating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recommendations -->
+    <div class="recommendations">
+        <h4 class="text-white mb-4">
+            <i class="material-icons me-2">recommend</i>
+            You Might Also Like
+        </h4>
+        <div class="row">
+            {% for related_film in recommended_films %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="recommendation-card" onclick="window.location.href='/films/{{ related_film.slug }}/'">
+                    <div class="card bg-gradient-dark">
+                        {% if related_film.poster %}
+                        <img src="{{ related_film.poster.url }}" alt="{{ related_film.title }}" class="recommendation-poster">
+                        {% else %}
+                        <div class="recommendation-poster bg-gradient-secondary d-flex align-items-center justify-content-center">
+                            <i class="material-icons" style="font-size: 40px; color: #666;">movie</i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="text-white mb-2">{{ related_film.title }}</h6>
+                            <div class="d-flex justify-content-between text-sm">
+                                <span class="text-muted">{{ related_film.release_date.year }}</span>
+                                <span class="text-muted">{{ related_film.duration }} min</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const video = document.getElementById('mainVideo');
+const playBtn = document.getElementById('playBtn');
+const playIcon = document.getElementById('playIcon');
+const controlPlayIcon = document.getElementById('controlPlayIcon');
+const progressFill = document.getElementById('progressFill');
+const timeDisplay = document.getElementById('timeDisplay');
+const muteIcon = document.getElementById('muteIcon');
+
+let isPlaying = false;
+
+function togglePlay() {
+    if (video) {
+        if (isPlaying) {
+            video.pause();
+            playIcon.textContent = 'play_arrow';
+            controlPlayIcon.textContent = 'play_arrow';
+        } else {
+            video.play();
+            playIcon.textContent = 'pause';
+            controlPlayIcon.textContent = 'pause';
+        }
+        isPlaying = !isPlaying;
+    }
+}
+
+function toggleMute() {
+    if (video) {
+        video.muted = !video.muted;
+        muteIcon.textContent = video.muted ? 'volume_off' : 'volume_up';
+    }
+}
+
+function toggleFullscreen() {
+    if (video) {
+        if (video.requestFullscreen) {
+            video.requestFullscreen();
+        }
+    }
+}
+
+function seek(event) {
+    if (video) {
+        const progressBar = event.currentTarget;
+        const clickX = event.offsetX;
+        const width = progressBar.offsetWidth;
+        const percentage = clickX / width;
+        video.currentTime = percentage * video.duration;
+    }
+}
+
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Update progress and time
+if (video) {
+    video.addEventListener('timeupdate', function() {
+        const progress = (video.currentTime / video.duration) * 100;
+        progressFill.style.width = progress + '%';
+        timeDisplay.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+    });
+    
+    video.addEventListener('ended', function() {
+        isPlaying = false;
+        playIcon.textContent = 'replay';
+        controlPlayIcon.textContent = 'replay';
+    });
+}
+
+function toggleWatchlist() {
+    // Implementation for watchlist functionality
+    const icon = document.getElementById('watchlistIcon');
+    const text = document.getElementById('watchlistText');
+    
+    if (icon.textContent === 'bookmark_border') {
+        icon.textContent = 'bookmark';
+        text.textContent = 'In Watchlist';
+    } else {
+        icon.textContent = 'bookmark_border';
+        text.textContent = 'Add to Watchlist';
+    }
+}
+
+function shareMovie() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ film.title }}',
+            text: '{{ film.description|truncatechars:100 }}',
+            url: window.location.href
+        });
+    } else {
+        // Fallback - copy to clipboard
+        navigator.clipboard.writeText(window.location.href);
+        alert('Movie link copied to clipboard!');
+    }
+}
+
+function downloadMovie() {
+    {% if film.video_file %}
+        window.open('{{ film.video_file.url }}', '_blank');
+    {% else %}
+        alert('Download not available for this movie.');
+    {% endif %}
+}
+
+// Increment view count
+fetch('/films/{{ film.slug }}/view/', {
+    method: 'POST',
+    headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+    }
+});
+</script>
+{% endblock %}

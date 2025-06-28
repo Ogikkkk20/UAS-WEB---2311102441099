@@ -1,0 +1,166 @@
+{% load static %}
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3   bg-gradient-dark" id="sidenav-main">
+    <div class="sidenav-header">
+      <i class="fas fa-times p-3 cursor-pointer text-white opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
+      <a class="navbar-brand m-0" href="/">
+        <img src="{% static 'dashboard/assets/img/logo-ct.png'%}" class="navbar-brand-img h-100" alt="main_logo">
+        <span class="ms-1 font-weight-bold text-white">StreamFlix</span>
+      </a>
+    </div>
+    <hr class="horizontal light mt-0 mb-2">
+    <div class="collapse navbar-collapse  w-auto h-auto max-height-vh-100 h-100" id="sidenav-collapse-main">
+      <ul class="navbar-nav">
+        
+        <!-- PROFILE -->
+        <li class="nav-item mb-2 mt-0">
+          <a data-bs-toggle="collapse" href="#ProfileNav" class="nav-link text-white" aria-controls="ProfileNav" role="button" aria-expanded="false">
+            <img src="{% static 'dashboard/assets/img/team-3.jpg'%}" class="avatar">
+            <span class="nav-link-text ms-2 ps-1">Ogi Febrian Saputra</span>
+          </a>
+        </li>
+        <hr class="horizontal light mt-0">
+        
+        <!-- HOME -->
+        <li class="nav-item">
+          <a href="/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">home</i>
+            <span class="nav-link-text ms-2 ps-1">Browse Movies</span>
+          </a>
+        </li>
+        
+        <!-- STREAMING SECTION -->
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder text-white">STREAMING</h6>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/films/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">movie</i>
+            <span class="nav-link-text ms-2 ps-1">All Movies</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/films/featured/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">star</i>
+            <span class="nav-link-text ms-2 ps-1">Featured</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/films/genres/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">category</i>
+            <span class="nav-link-text ms-2 ps-1">Genres</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/films/watchlist/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">bookmark</i>
+            <span class="nav-link-text ms-2 ps-1">My Watchlist</span>
+          </a>
+        </li>
+        
+        <!-- MANAGEMENT SECTION -->
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder text-white">MANAGEMENT</h6>
+        </li>
+        
+        <li class="nav-item">
+          <a data-bs-toggle="collapse" href="#filmManagement" class="nav-link text-white" aria-controls="filmManagement" role="button" aria-expanded="false">
+            <i class="material-icons-round me-2">video_library</i>
+            <span class="nav-link-text ms-2 ps-1">Film Management</span>
+          </a>
+          <div class="collapse" id="filmManagement">
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link text-white" href="/films/manage/">
+                  <span class="sidenav-mini-icon">D</span>
+                  <span class="sidenav-normal ms-2 ps-1">Dashboard</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="/films/add/">
+                  <span class="sidenav-mini-icon">+</span>
+                  <span class="sidenav-normal ms-2 ps-1">Add Film</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="/films/manage/list/">
+                  <span class="sidenav-mini-icon">L</span>
+                  <span class="sidenav-normal ms-2 ps-1">List Films</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="/films/upload-video/">
+                  <span class="sidenav-mini-icon">V</span>
+                  <span class="sidenav-normal ms-2 ps-1">Upload Video</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        
+        <li class="nav-item">
+          <a data-bs-toggle="collapse" href="#userManagement" class="nav-link text-white" aria-controls="userManagement" role="button" aria-expanded="false">
+            <i class="material-icons-round me-2">people</i>
+            <span class="nav-link-text ms-2 ps-1">User Management</span>
+          </a>
+          <div class="collapse" id="userManagement">
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link text-white" href="/users/manage/">
+                  <span class="sidenav-mini-icon">D</span>
+                  <span class="sidenav-normal ms-2 ps-1">Dashboard</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" href="/users/list/">
+                  <span class="sidenav-mini-icon">L</span>
+                  <span class="sidenav-normal ms-2 ps-1">List Users</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        
+        <!-- ADMIN SECTION -->
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder text-white">ADMIN</h6>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/admin/" class="nav-link text-white" target="_blank">
+            <i class="material-icons-round opacity-10">admin_panel_settings</i>
+            <span class="nav-link-text ms-2 ps-1">Django Admin</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/database/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">storage</i>
+            <span class="nav-link-text ms-2 ps-1">Database</span>
+          </a>
+        </li>
+        
+        <!-- ACCOUNT SECTION -->
+        <li class="nav-item mt-3">
+          <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder text-white">ACCOUNT</h6>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/auth/profile/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">person</i>
+            <span class="nav-link-text ms-2 ps-1">Profile</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/auth/logout/" class="nav-link text-white">
+            <i class="material-icons-round opacity-10">logout</i>
+            <span class="nav-link-text ms-2 ps-1">Logout</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </aside>

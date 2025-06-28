@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Custom apps
+    'films',
     'artikel'
 ]
 
@@ -78,11 +80,11 @@ WSGI_APPLICATION = 'tes_django.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'artikel',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'django_blog',
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PASSWORD': 'nazriel2112',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
@@ -125,7 +127,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')

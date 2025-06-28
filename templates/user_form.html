@@ -1,0 +1,436 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        padding: 30px;
+        margin-bottom: 25px;
+    }
+    .form-header {
+        border-bottom: 2px solid #f8f9fa;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+    }
+    .form-section {
+        margin-bottom: 30px;
+    }
+    .form-section h5 {
+        color: #495057;
+        border-left: 4px solid #667eea;
+        padding-left: 15px;
+        margin-bottom: 20px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    .form-check {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 15px;
+    }
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+    .btn-group-actions {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 30px;
+    }
+    .password-strength {
+        margin-top: 5px;
+        font-size: 12px;
+    }
+    .strength-weak { color: #dc3545; }
+    .strength-medium { color: #ffc107; }
+    .strength-strong { color: #28a745; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-2">{{ title }}</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'user_management' %}">User Management</a></li>
+                    <li class="breadcrumb-item active">{{ action }} User</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'user_management' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Users
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <div class="form-header">
+            <h4 class="mb-2">
+                <i class="fas fa-user me-2"></i>{{ title }}
+            </h4>
+            <p class="text-muted mb-0">
+                {% if user_obj %}
+                    Update user information and permissions for @{{ user_obj.username }}
+                {% else %}
+                    Fill in the form below to create a new user account
+                {% endif %}
+            </p>
+        </div>
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+            
+            <!-- Display form errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show">
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endif %}
+
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h5><i class="fas fa-id-card me-2"></i>Basic Information</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Username *</label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.username.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.email.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.first_name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.last_name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Password Section -->
+            <div class="form-section">
+                <h5><i class="fas fa-lock me-2"></i>Password</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">
+                                Password {% if not user_obj %}*{% endif %}
+                            </label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.password.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.password.help_text }}</div>
+                            <div id="passwordStrength" class="password-strength"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.password_confirm.id_for_label }}" class="form-label">
+                                Confirm Password {% if not user_obj %}*{% endif %}
+                            </label>
+                            {{ form.password_confirm }}
+                            {% if form.password_confirm.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.password_confirm.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.password_confirm.help_text }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Permissions Section -->
+            <div class="form-section">
+                <h5><i class="fas fa-shield-alt me-2"></i>Permissions & Status</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                <strong>Active</strong>
+                                <div class="form-text">User can log in to the system</div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            {{ form.is_staff }}
+                            <label class="form-check-label" for="{{ form.is_staff.id_for_label }}">
+                                <strong>Staff Status</strong>
+                                <div class="form-text">User can access admin interface</div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check">
+                            {{ form.is_superuser }}
+                            <label class="form-check-label" for="{{ form.is_superuser.id_for_label }}">
+                                <strong>Superuser Status</strong>
+                                <div class="form-text">User has all permissions</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-group-actions">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        {% if user_obj %}
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                User created: {{ user_obj.date_joined|date:"M d, Y H:i" }}
+                                {% if user_obj.last_login %}
+                                    | Last login: {{ user_obj.last_login|date:"M d, Y H:i" }}
+                                {% endif %}
+                            </small>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'user_management' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>{{ action }} User
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Password strength checker
+function checkPasswordStrength(password) {
+    const strengthIndicator = document.getElementById('passwordStrength');
+    if (!strengthIndicator) return;
+    
+    if (password.length === 0) {
+        strengthIndicator.innerHTML = '';
+        return;
+    }
+    
+    let strength = 0;
+    let feedback = [];
+    
+    // Length check
+    if (password.length >= 8) strength++;
+    else feedback.push('At least 8 characters');
+    
+    // Character variety checks
+    if (/[a-z]/.test(password)) strength++;
+    else feedback.push('Lowercase letters');
+    
+    if (/[A-Z]/.test(password)) strength++;
+    else feedback.push('Uppercase letters');
+    
+    if (/[0-9]/.test(password)) strength++;
+    else feedback.push('Numbers');
+    
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    else feedback.push('Special characters');
+    
+    // Display strength
+    let strengthText = '';
+    let strengthClass = '';
+    
+    if (strength < 2) {
+        strengthText = 'Weak';
+        strengthClass = 'strength-weak';
+    } else if (strength < 4) {
+        strengthText = 'Medium';
+        strengthClass = 'strength-medium';
+    } else {
+        strengthText = 'Strong';
+        strengthClass = 'strength-strong';
+    }
+    
+    let html = `<span class="${strengthClass}">Password strength: ${strengthText}</span>`;
+    
+    if (feedback.length > 0 && strength < 4) {
+        html += `<br><small>Missing: ${feedback.join(', ')}</small>`;
+    }
+    
+    strengthIndicator.innerHTML = html;
+}
+
+// Add event listeners when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordField = document.querySelector('input[name="password"]');
+    const confirmField = document.querySelector('input[name="password_confirm"]');
+    
+    if (passwordField) {
+        passwordField.addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+        });
+    }
+    
+    // Password confirmation validation
+    if (confirmField && passwordField) {
+        confirmField.addEventListener('input', function() {
+            if (this.value && passwordField.value !== this.value) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const password = passwordField?.value || '';
+            const confirmPassword = confirmField?.value || '';
+            
+            {% if not user_obj %}
+            // For new users, password is required
+            if (!password) {
+                e.preventDefault();
+                alert('Password is required for new users');
+                return;
+            }
+            {% endif %}
+            
+            if (password && password !== confirmPassword) {
+                e.preventDefault();
+                alert('Passwords do not match');
+                return;
+            }
+        });
+    }
+});
+
+// Auto-save draft functionality
+let saveTimeout;
+function saveDraft() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        const formData = new FormData(document.querySelector('form'));
+        const draftData = {};
+        
+        for (let [key, value] of formData.entries()) {
+            if (key !== 'csrfmiddlewaretoken' && key !== 'password' && key !== 'password_confirm') {
+                draftData[key] = value;
+            }
+        }
+        
+        localStorage.setItem('userFormDraft', JSON.stringify(draftData));
+    }, 1000);
+}
+
+// Load draft data
+function loadDraft() {
+    const draft = localStorage.getItem('userFormDraft');
+    if (draft) {
+        const draftData = JSON.parse(draft);
+        for (let [key, value] of Object.entries(draftData)) {
+            const field = document.querySelector(`[name="${key}"]`);
+            if (field) {
+                if (field.type === 'checkbox') {
+                    field.checked = value === 'on';
+                } else {
+                    field.value = value;
+                }
+            }
+        }
+    }
+}
+
+// Add event listeners for auto-save
+document.addEventListener('DOMContentLoaded', function() {
+    {% if not user_obj %}
+    // Only load draft for new users
+    loadDraft();
+    {% endif %}
+    
+    // Add auto-save to form fields
+    const formFields = document.querySelectorAll('input, select, textarea');
+    formFields.forEach(field => {
+        field.addEventListener('input', saveDraft);
+        field.addEventListener('change', saveDraft);
+    });
+    
+    // Clear draft on successful submission
+    document.querySelector('form').addEventListener('submit', function() {
+        localStorage.removeItem('userFormDraft');
+    });
+});
+</script>
+{% endblock %}

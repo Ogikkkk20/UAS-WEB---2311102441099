@@ -1,0 +1,308 @@
+{% extends "dashboard/modern_base.html" %}
+
+{% block page_title %}{{ title|default:"Edit User" }}{% endblock %}
+{% block page_subtitle %}{% if action == "Create" %}Add new user to the system{% else %}Update user information and permissions{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 animate-fade-in-up">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ title|default:"Edit User" }}</h1>
+            <p class="text-gray-600 mt-1">
+                {% if action == "Create" %}
+                    Add a new user with appropriate permissions
+                {% else %}
+                    Update user information and settings
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="flex space-x-3 mt-4 md:mt-0">
+            <a href="{% url 'user_management' %}" 
+               class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors flex items-center space-x-2">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Users</span>
+            </a>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Personal Information -->
+                <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.1s">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 gradient-blue rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-900">Personal Information</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Username -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Username <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="username" 
+                                   value="{{ form.username.value|default:'' }}"
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                   placeholder="Enter username"
+                                   required>
+                            {% if form.username.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- First Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                            <input type="text" 
+                                   name="first_name" 
+                                   value="{{ form.first_name.value|default:'' }}"
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                   placeholder="First name">
+                            {% if form.first_name.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.first_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Last Name -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                            <input type="text" 
+                                   name="last_name" 
+                                   value="{{ form.last_name.value|default:'' }}"
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                   placeholder="Last name">
+                            {% if form.last_name.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.last_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <input type="email" 
+                                   name="email" 
+                                   value="{{ form.email.value|default:'' }}"
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                   placeholder="user@example.com">
+                            {% if form.email.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Gender -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                            <select name="gender" 
+                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+                                <option value="">Select Gender</option>
+                                <option value="male" {% if form.gender.value == 'male' %}selected{% endif %}>Male</option>
+                                <option value="female" {% if form.gender.value == 'female' %}selected{% endif %}>Female</option>
+                                <option value="other" {% if form.gender.value == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                            {% if form.gender.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.gender.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                            <input type="tel" 
+                                   name="phone" 
+                                   value="{{ form.phone.value|default:'' }}"
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                   placeholder="+1234567890">
+                            {% if form.phone.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.phone.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Bio -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                            <textarea name="bio" 
+                                      class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                      rows="3" 
+                                      placeholder="Tell us about yourself...">{{ form.bio.value|default:'' }}</textarea>
+                            {% if form.bio.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.bio.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Password Section -->
+                <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.2s">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 gradient-red rounded-lg flex items-center justify-center">
+                            <i class="fas fa-lock text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-900">Password</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Password -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Password {% if action == "Create" %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <input type="password" 
+                                   name="password" 
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                   placeholder="{% if action == 'Create' %}Enter password{% else %}Leave blank to keep current{% endif %}"
+                                   {% if action == "Create" %}required{% endif %}>
+                            {% if form.password.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.password.errors.0 }}</p>
+                            {% endif %}
+                            {% if action != "Create" %}
+                                <p class="text-gray-500 text-sm mt-1">Leave blank to keep current password</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Confirm Password -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Confirm Password {% if action == "Create" %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <input type="password" 
+                                   name="password_confirm" 
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                   placeholder="{% if action == 'Create' %}Confirm password{% else %}Confirm new password{% endif %}"
+                                   {% if action == "Create" %}required{% endif %}>
+                            {% if form.password_confirm.errors %}
+                                <p class="text-red-500 text-sm mt-1">{{ form.password_confirm.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                
+                <!-- User Status -->
+                <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.3s">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 gradient-green rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-check text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-900">Status</h2>
+                    </div>
+                    
+                    <!-- Active Status -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Active User</label>
+                            <p class="text-xs text-gray-500">User can login and access the system</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" 
+                                   name="is_active" 
+                                   {% if form.is_active.value %}checked{% endif %}
+                                   class="sr-only"
+                                   x-model="isActive">
+                            <div @click="isActive = !isActive" 
+                                 :class="isActive ? 'bg-green-500' : 'bg-gray-300'"
+                                 class="w-11 h-6 rounded-full cursor-pointer transition-colors">
+                                <div :class="isActive ? 'translate-x-6' : 'translate-x-1'"
+                                     class="w-4 h-4 bg-white rounded-full mt-1 transition-transform"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Permissions -->
+                <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.4s">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 gradient-orange rounded-lg flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-900">Permissions</h2>
+                    </div>
+                    
+                    <!-- Staff Status -->
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Staff Access</label>
+                            <p class="text-xs text-gray-500">Can access admin interface</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" 
+                                   name="is_staff" 
+                                   {% if form.is_staff.value %}checked{% endif %}
+                                   class="sr-only"
+                                   x-model="isStaff">
+                            <div @click="isStaff = !isStaff" 
+                                 :class="isStaff ? 'bg-orange-500' : 'bg-gray-300'"
+                                 class="w-11 h-6 rounded-full cursor-pointer transition-colors">
+                                <div :class="isStaff ? 'translate-x-6' : 'translate-x-1'"
+                                     class="w-4 h-4 bg-white rounded-full mt-1 transition-transform"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Superuser Status -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Superuser</label>
+                            <p class="text-xs text-gray-500">Full system access and permissions</p>
+                        </div>
+                        <div class="relative">
+                            <input type="checkbox" 
+                                   name="is_superuser" 
+                                   {% if form.is_superuser.value %}checked{% endif %}
+                                   class="sr-only"
+                                   x-model="isSuperuser">
+                            <div @click="isSuperuser = !isSuperuser" 
+                                 :class="isSuperuser ? 'bg-red-500' : 'bg-gray-300'"
+                                 class="w-11 h-6 rounded-full cursor-pointer transition-colors">
+                                <div :class="isSuperuser ? 'translate-x-6' : 'translate-x-1'"
+                                     class="w-4 h-4 bg-white rounded-full mt-1 transition-transform"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.5s">
+                    <div class="space-y-4">
+                        <button type="submit" 
+                                class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl hover-lift transition-all duration-300 hover:shadow-lg font-medium">
+                            <i class="fas fa-save mr-2"></i>
+                            {% if action == "Create" %}Create User{% else %}Update User{% endif %}
+                        </button>
+                        
+                        <a href="{% url 'user_management' %}" 
+                           class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium text-center block">
+                            <i class="fas fa-times mr-2"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+function userForm() {
+    return {
+        isActive: {{ form.is_active.value|yesno:"true,false" }},
+        isStaff: {{ form.is_staff.value|yesno:"true,false" }},
+        isSuperuser: {{ form.is_superuser.value|yesno:"true,false" }},
+    }
+}
+</script>
+{% endblock %}

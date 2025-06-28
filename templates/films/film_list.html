@@ -1,0 +1,217 @@
+{% extends 'films/base.html' %}
+
+{% block title %}Film Database{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="text-center py-5" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); border-radius: 20px; color: white;">
+            <h1 class="display-4 fw-bold mb-3">🎬 Film Database</h1>
+            <p class="lead">Discover amazing films from our curated collection</p>
+            <div class="row justify-content-center mt-4">
+                <div class="col-md-2 col-6 text-center">
+                    <h3 class="fw-bold">{{ total_films }}</h3>
+                    <small>Films</small>
+                </div>
+                <div class="col-md-2 col-6 text-center">
+                    <h3 class="fw-bold">{{ genres.count }}</h3>
+                    <small>Genres</small>
+                </div>
+                {% if user.is_staff %}
+                <div class="col-md-2 col-6 text-center">
+                    <a href="{% url 'films:film_management' %}" class="btn btn-light btn-sm mt-2">
+                        <i class="fas fa-cog me-1"></i>Manage Films
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Films -->
+{% if featured_films %}
+<div class="row mb-5">
+    <div class="col-12">
+        <h2 class="fw-bold mb-4">⭐ Featured Films</h2>
+        <div class="row">
+            {% for film in featured_films %}
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-4">
+                <div class="film-card h-100">
+                    {% if film.poster %}
+                        <img src="{{ film.poster.url }}" alt="{{ film.title }}" class="film-poster">
+                    {% else %}
+                        <div class="film-poster d-flex align-items-center justify-content-center bg-light">
+                            <i class="fas fa-film fa-3x text-muted"></i>
+                        </div>
+                    {% endif %}
+                    <div class="card-body p-3">
+                        <h6 class="card-title fw-bold mb-2">{{ film.title|truncatechars:20 }}</h6>
+                        <p class="film-meta mb-2">
+                            <small>{{ film.director }}<br>{{ film.release_date.year }} • {{ film.duration }}min</small>
+                        </p>
+                        {% if film.imdb_rating %}
+                        <div class="rating-stars mb-2">
+                            <i class="fas fa-star"></i> {{ film.imdb_rating }}/10
+                        </div>
+                        {% endif %}
+                        <div class="mb-2">
+                            {% for genre in film.genres.all|slice:":2" %}
+                                <span class="badge bg-primary">{{ genre.name }}</span>
+                            {% endfor %}
+                        </div>
+                        <a href="{% url 'films:film_detail' film.slug %}" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-eye me-1"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Search and Filter -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Search Films</label>
+                        {{ search_form.search }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Genre</label>
+                        {{ search_form.genre }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Rating</label>
+                        {{ search_form.rating }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Sort By</label>
+                        {{ search_form.sort_by }}
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Search Films
+                        </button>
+                        <a href="{% url 'films:film_list' %}" class="btn btn-outline-secondary ms-2">
+                            <i class="fas fa-times me-2"></i>Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Film Grid -->
+<div class="row">
+    {% for film in page_obj %}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        <div class="film-card h-100">
+            {% if film.poster %}
+                <img src="{{ film.poster.url }}" alt="{{ film.title }}" class="film-poster">
+            {% else %}
+                <div class="film-poster d-flex align-items-center justify-content-center bg-light">
+                    <i class="fas fa-film fa-3x text-muted"></i>
+                </div>
+            {% endif %}
+            <div class="card-body p-3">
+                <h5 class="card-title fw-bold mb-2">{{ film.title }}</h5>
+                <p class="film-meta mb-2">
+                    <strong>Director:</strong> {{ film.director }}<br>
+                    <strong>Year:</strong> {{ film.release_date.year }} • {{ film.duration }} min<br>
+                    <strong>Rating:</strong> {{ film.get_rating_display }}
+                </p>
+                
+                {% if film.imdb_rating %}
+                <div class="rating-stars mb-2">
+                    <i class="fas fa-star"></i> {{ film.imdb_rating }}/10
+                </div>
+                {% endif %}
+                
+                <p class="card-text">{{ film.description|truncatechars:100 }}</p>
+                
+                <div class="mb-3">
+                    {% for genre in film.genres.all %}
+                        <span class="genre-tag">{{ genre.name }}</span>
+                    {% endfor %}
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="fas fa-eye"></i> {{ film.views_count }} views
+                    </small>
+                    {% if film.featured %}
+                        <span class="badge bg-warning">Featured</span>
+                    {% endif %}
+                </div>
+                
+                <a href="{% url 'films:film_detail' film.slug %}" class="btn btn-primary w-100 mt-2">
+                    <i class="fas fa-play me-2"></i>View Film
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-film fa-5x text-muted mb-4"></i>
+            <h3>No films found</h3>
+            <p class="text-muted">Try adjusting your search criteria or check back later for new films.</p>
+            {% if user.is_staff %}
+                <a href="{% url 'films:film_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Your First Film
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Film pagination" class="mt-5">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode }}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode }}">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+    
+    <div class="text-center mt-3">
+        <small class="text-muted">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} films
+        </small>
+    </div>
+</nav>
+{% endif %}
+{% endblock %}

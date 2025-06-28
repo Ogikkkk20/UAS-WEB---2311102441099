@@ -1,0 +1,146 @@
+{% extends "dashboard/modern_base.html" %}
+
+{% block page_title %}{{ action|default:"Edit" }} Genre{% endblock %}
+{% block page_subtitle %}{% if action == "Create" %}Add new genre category{% else %}Update genre information{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 animate-fade-in-up">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ action|default:"Edit" }} Genre</h1>
+            <p class="text-gray-600 mt-1">
+                {% if action == "Create" %}
+                    Add a new genre to organize your films
+                {% else %}
+                    Update genre information
+                {% endif %}
+            </p>
+        </div>
+        
+        <div class="flex space-x-3 mt-4 md:mt-0">
+            <a href="{% url 'films:genre_management' %}" 
+               class="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-200 transition-colors flex items-center space-x-2">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Genres</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.1s">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Genre Icon -->
+            <div class="flex justify-center mb-6">
+                <div class="w-20 h-20 gradient-purple rounded-xl flex items-center justify-center">
+                    <i class="fas fa-tags text-white text-2xl"></i>
+                </div>
+            </div>
+            
+            <!-- Genre Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Genre Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       name="name" 
+                       value="{{ form.name.value|default:'' }}"
+                       class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                       placeholder="Enter genre name (e.g., Action, Drama, Comedy)"
+                       required>
+                {% if form.name.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Genre Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <div class="ckeditor-wrapper">
+                    <textarea id="genre-description-editor" name="description" 
+                              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                              placeholder="Optional description for this genre">{{ form.description.value|default:'' }}</textarea>
+                </div>
+                {% if form.description.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="flex space-x-4 pt-6">
+                <button type="submit" 
+                        class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl hover-lift transition-all duration-300 hover:shadow-lg font-medium">
+                    <i class="fas fa-save mr-2"></i>
+                    {% if action == "Create" %}Create Genre{% else %}Update Genre{% endif %}
+                </button>
+                
+                <a href="{% url 'films:genre_management' %}" 
+                   class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium text-center">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Tips -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-6 animate-fade-in-up" style="animation-delay: 0.2s">
+        <div class="flex items-start space-x-3">
+            <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fas fa-lightbulb text-white text-sm"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-medium text-blue-900 mb-1">Tips for Creating Genres</h4>
+                <ul class="text-sm text-blue-700 space-y-1">
+                    <li>• Use clear, descriptive names that users will easily understand</li>
+                    <li>• Keep genre names consistent (e.g., "Science Fiction" vs "Sci-Fi")</li>
+                    <li>• Consider your target audience when creating categories</li>
+                    <li>• You can always edit or merge genres later if needed</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize CKEditor for Genre Description
+document.addEventListener('DOMContentLoaded', function() {
+    ClassicEditor
+        .create(document.querySelector('#genre-description-editor'), {
+            toolbar: {
+                items: [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', '|',
+                    'fontSize', 'fontColor', '|',
+                    'numberedList', 'bulletedList', '|',
+                    'link', 'blockQuote', '|',
+                    'undo', 'redo'
+                ]
+            },
+            language: 'en',
+            licenseKey: '',
+        })
+        .then(editor => {
+            // Custom styling for CKEditor
+            editor.editing.view.change(writer => {
+                writer.setStyle('border-radius', '12px', editor.editing.view.document.getRoot());
+                writer.setStyle('border', '1px solid #e5e7eb', editor.editing.view.document.getRoot());
+            });
+            
+            // Handle form submission
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                // Update textarea value with editor content
+                document.querySelector('#genre-description-editor').value = editor.getData();
+            });
+        })
+        .catch(error => {
+            console.error('Error initializing Genre Description CKEditor:', error);
+        });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,322 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <!-- Navbar -->
+  <nav class="navbar navbar-main navbar-expand-lg px-0 mx-4 shadow-none border-radius-xl" id="navbarBlur" data-scroll="true">
+    <div class="container-fluid py-1 px-3">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
+          <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="/dashboard/">Dashboard</a></li>
+          <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="{% url 'films:film_management' %}">Film Management</a></li>
+          <li class="breadcrumb-item text-sm text-dark active" aria-current="page">{{ action }} Film</li>
+        </ol>
+        <h6 class="font-weight-bolder mb-0">{{ action }} Film</h6>
+      </nav>
+      <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
+        <div class="ms-md-auto pe-md-3 d-flex align-items-center">
+          <a href="{% url 'films:film_management' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="material-icons text-sm">arrow_back</i>&nbsp;&nbsp;Back to Films
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <!-- End Navbar -->
+
+  <div class="container-fluid py-4">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <div class="row">
+        <!-- Left Column - Main Content -->
+        <div class="col-lg-8">
+          <!-- Basic Information -->
+          <div class="card mb-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                <h6 class="text-white text-capitalize ps-3">
+                  <i class="material-icons opacity-10 me-2">info</i>Basic Information
+                </h6>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="input-group input-group-outline mb-3 {% if form.title.value %}is-filled{% endif %}">
+                    <label class="form-label">Title *</label>
+                    {{ form.title }}
+                  </div>
+                  {% if form.title.errors %}
+                    <div class="text-danger text-sm">{{ form.title.errors.0 }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="input-group input-group-outline mb-3 {% if form.director.value %}is-filled{% endif %}">
+                    <label class="form-label">Director *</label>
+                    {{ form.director }}
+                  </div>
+                  {% if form.director.errors %}
+                    <div class="text-danger text-sm">{{ form.director.errors.0 }}</div>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <div class="input-group input-group-outline mb-3 {% if form.cast.value %}is-filled{% endif %}">
+                    <label class="form-label">Cast</label>
+                    {{ form.cast }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="input-group input-group-outline mb-3 {% if form.release_date.value %}is-filled{% endif %}">
+                    <label class="form-label">Release Date</label>
+                    {{ form.release_date }}
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="input-group input-group-outline mb-3 {% if form.duration.value %}is-filled{% endif %}">
+                    <label class="form-label">Duration (minutes)</label>
+                    {{ form.duration }}
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="input-group input-group-outline mb-3 {% if form.rating.value %}is-filled{% endif %}">
+                    <label class="form-label">Rating</label>
+                    {{ form.rating }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="input-group input-group-outline mb-3 {% if form.description.value %}is-filled{% endif %}">
+                    <textarea class="form-control" name="description" rows="4" placeholder="Short description for film cards" required>{{ form.description.value|default:'' }}</textarea>
+                  </div>
+                  {% if form.description.errors %}
+                    <div class="text-danger text-sm">{{ form.description.errors.0 }}</div>
+                  {% endif %}
+                  <small class="text-muted">Short description for film cards (required)</small>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="input-group input-group-outline mb-3 {% if form.synopsis.value %}is-filled{% endif %}">
+                    <textarea class="form-control" name="synopsis" rows="6" placeholder="Detailed plot summary">{{ form.synopsis.value|default:'' }}</textarea>
+                  </div>
+                  {% if form.synopsis.errors %}
+                    <div class="text-danger text-sm">{{ form.synopsis.errors.0 }}</div>
+                  {% endif %}
+                  <small class="text-muted">Detailed plot summary</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Media Files -->
+          <div class="card mb-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-success shadow-success border-radius-lg pt-4 pb-3">
+                <h6 class="text-white text-capitalize ps-3">
+                  <i class="material-icons opacity-10 me-2">video_library</i>Media Files
+                </h6>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label">Video File</label>
+                  {{ form.video_file }}
+                  {% if film.video_file %}
+                    <small class="text-success d-block">Current: {{ film.video_file.name }}</small>
+                  {% endif %}
+                  <small class="text-muted">Upload MP4, AVI, MOV files</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Trailer URL</label>
+                  <div class="input-group input-group-outline {% if form.trailer_url.value %}is-filled{% endif %}">
+                    <label class="form-label">YouTube/Vimeo URL</label>
+                    {{ form.trailer_url }}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row mt-3">
+                <div class="col-md-4">
+                  <label class="form-label">Poster Image</label>
+                  {{ form.poster }}
+                  {% if film.poster %}
+                    <img src="{{ film.poster.url }}" class="img-thumbnail mt-2" style="max-width: 100px;">
+                  {% endif %}
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Backdrop Image</label>
+                  {{ form.backdrop }}
+                  {% if film.backdrop %}
+                    <img src="{{ film.backdrop.url }}" class="img-thumbnail mt-2" style="max-width: 100px;">
+                  {% endif %}
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Thumbnail</label>
+                  {{ form.thumbnail }}
+                  {% if film.thumbnail %}
+                    <img src="{{ film.thumbnail.url }}" class="img-thumbnail mt-2" style="max-width: 100px;">
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Settings -->
+        <div class="col-lg-4">
+          <!-- Status & Settings -->
+          <div class="card mb-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-info shadow-info border-radius-lg pt-4 pb-3">
+                <h6 class="text-white text-capitalize ps-3">
+                  <i class="material-icons opacity-10 me-2">settings</i>Settings
+                </h6>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <label class="form-label">Status</label>
+                  {{ form.status }}
+                </div>
+              </div>
+              
+              <div class="row mt-3">
+                <div class="col-md-12">
+                  <div class="form-check form-switch">
+                    {{ form.featured }}
+                    <label class="form-check-label" for="{{ form.featured.id_for_label }}">
+                      Featured Film
+                    </label>
+                  </div>
+                  <small class="text-muted">Featured films appear on homepage</small>
+                </div>
+              </div>
+              
+              <div class="row mt-3">
+                <div class="col-md-12">
+                  <div class="input-group input-group-outline {% if form.imdb_rating.value %}is-filled{% endif %}">
+                    <label class="form-label">IMDB Rating</label>
+                    {{ form.imdb_rating }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Genres -->
+          <div class="card mb-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+              <div class="bg-gradient-warning shadow-warning border-radius-lg pt-4 pb-3">
+                <h6 class="text-white text-capitalize ps-3">
+                  <i class="material-icons opacity-10 me-2">category</i>Genres
+                </h6>
+              </div>
+            </div>
+            <div class="card-body">
+              {{ form.genres }}
+              <small class="text-muted">Hold Ctrl/Cmd to select multiple genres</small>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card">
+            <div class="card-body">
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn bg-gradient-primary">
+                  <i class="material-icons me-2">save</i>{{ action }} Film
+                </button>
+                
+                {% if film %}
+                <a href="{% url 'films:film_detail' film.slug %}" class="btn btn-outline-info" target="_blank">
+                  <i class="material-icons me-2">visibility</i>Preview Film
+                </a>
+                
+                {% if film.video_file %}
+                <a href="{% url 'films:watch_film' film.slug %}" class="btn btn-outline-success" target="_blank">
+                  <i class="material-icons me-2">play_arrow</i>Watch Film
+                </a>
+                {% endif %}
+                {% endif %}
+                
+                <a href="{% url 'films:film_management' %}" class="btn btn-outline-secondary">
+                  <i class="material-icons me-2">cancel</i>Cancel
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<style>
+.input-group-outline .form-control {
+  background: none;
+  border: 1px solid #d2d6da;
+  border-radius: 0.375rem;
+  color: #495057;
+}
+
+.input-group-outline.is-filled .form-label,
+.input-group-outline .form-control:focus ~ .form-label {
+  transform: translateY(-0.75rem) scale(0.85);
+  transform-origin: 0 0;
+  color: #e91e63;
+}
+
+.input-group-outline .form-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  padding: 0 0.25rem;
+  background: #fff;
+  color: #adb5bd;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ck-editor__editable {
+  min-height: 150px;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-fill input group styling
+    document.querySelectorAll('.input-group-outline input, .input-group-outline textarea, .input-group-outline select').forEach(function(element) {
+        if (element.value) {
+            element.closest('.input-group-outline').classList.add('is-filled');
+        }
+        
+        element.addEventListener('focus', function() {
+            this.closest('.input-group-outline').classList.add('is-focused');
+        });
+        
+        element.addEventListener('blur', function() {
+            this.closest('.input-group-outline').classList.remove('is-focused');
+            if (this.value) {
+                this.closest('.input-group-outline').classList.add('is-filled');
+            } else {
+                this.closest('.input-group-outline').classList.remove('is-filled');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

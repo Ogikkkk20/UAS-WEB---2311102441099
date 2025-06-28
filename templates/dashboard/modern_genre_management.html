@@ -1,0 +1,147 @@
+{% extends "dashboard/modern_base.html" %}
+
+{% block page_title %}Genre Management{% endblock %}
+{% block page_subtitle %}Manage your film genres{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    
+    <!-- Header Actions -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+        <div class="animate-fade-in-up">
+            <h1 class="text-3xl font-bold text-gray-900">Genre Management</h1>
+            <p class="text-gray-600 mt-1">Organize your film categories</p>
+        </div>
+        
+        <div class="flex space-x-3 animate-fade-in-up" style="animation-delay: 0.1s">
+            <a href="{% url 'films:genre_create' %}" 
+               class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl hover-lift transition-all duration-300 hover:shadow-lg flex items-center space-x-2">
+                <i class="fas fa-plus"></i>
+                <span>Add New Genre</span>
+            </a>
+            
+            <a href="{% url 'films:film_management' %}" 
+               class="bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Films</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Stats Card -->
+    <div class="bg-white rounded-xl shadow-lg p-6 animate-fade-in-up" style="animation-delay: 0.2s">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500">Total Genres</p>
+                <p class="text-2xl font-bold text-gray-900">{{ total_genres|default:'0' }}</p>
+            </div>
+            <div class="w-10 h-10 gradient-purple rounded-lg flex items-center justify-center">
+                <i class="fas fa-tags text-white"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Genres Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for genre in genres %}
+        <div class="bg-white rounded-xl shadow-lg p-6 hover-lift transition-all duration-300 animate-fade-in-up" 
+             style="animation-delay: {{ forloop.counter|add:'2'|floatformat:1 }}s">
+            
+            <!-- Genre Icon -->
+            <div class="w-12 h-12 gradient-blue rounded-lg flex items-center justify-center mb-4">
+                <i class="fas fa-tag text-white text-lg"></i>
+            </div>
+            
+            <!-- Genre Info -->
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ genre.name }}</h3>
+                <p class="text-sm text-gray-500">
+                    {{ genre.film_count }} film{{ genre.film_count|pluralize }}
+                </p>
+                {% if genre.description %}
+                    <p class="text-sm text-gray-600 mt-2">{{ genre.description|truncatewords:10 }}</p>
+                {% endif %}
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex space-x-2">
+                <a href="{% url 'films:genre_edit' genre.id %}" 
+                   class="flex-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors text-center">
+                    <i class="fas fa-edit mr-1"></i>
+                    Edit
+                </a>
+                
+                <button onclick="deleteGenre({{ genre.id }}, '{{ genre.name }}')"
+                        class="flex-1 bg-red-50 text-red-600 px-3 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors">
+                    <i class="fas fa-trash mr-1"></i>
+                    Delete
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Empty State -->
+        <div class="col-span-full bg-white rounded-xl shadow-lg p-12 text-center animate-fade-in-up">
+            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-tags text-gray-400 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">No Genres Yet</h3>
+            <p class="text-gray-600 mb-6">Start by creating your first genre to organize your films.</p>
+            <a href="{% url 'films:genre_create' %}" 
+               class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl hover-lift transition-all duration-300 hover:shadow-lg inline-flex items-center space-x-2">
+                <i class="fas fa-plus"></i>
+                <span>Create First Genre</span>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 animate-scale-in">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Delete Genre</h3>
+            <p class="text-gray-600 mb-6">
+                Are you sure you want to delete the genre "<span id="genreName"></span>"? 
+                This action cannot be undone.
+            </p>
+            
+            <div class="flex space-x-3">
+                <button onclick="hideDeleteModal()" 
+                        class="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl hover:bg-gray-200 transition-colors font-medium">
+                    Cancel
+                </button>
+                <form id="deleteForm" method="post" class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="w-full bg-red-600 text-white py-3 rounded-xl hover:bg-red-700 transition-colors font-medium">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function deleteGenre(genreId, genreName) {
+    document.getElementById('genreName').textContent = genreName;
+    document.getElementById('deleteForm').action = `/films/management/genres/delete/${genreId}/`;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function hideDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideDeleteModal();
+    }
+});
+</script>
+{% endblock %}

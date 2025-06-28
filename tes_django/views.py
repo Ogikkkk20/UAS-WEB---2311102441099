@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from artikel.models import Category, Post, Comment
+from django.contrib.auth.decorators import login_required
 
 def welcome (request):
     template_name = "landingpage/index.html"
@@ -14,10 +15,31 @@ def welcome (request):
     }
     return render(request, template_name, context)
 
+@login_required(login_url='/login/')
 def dashboard (request):
-    template_name = "dashboard/base.html"
+    template_name = "dashboard/modern_dashboard.html"
+    
+    # Import models to get statistics
+    try:
+        from films.models import Film, FilmReview
+        from django.contrib.auth.models import User
+        
+        total_films = Film.objects.count()
+        total_users = User.objects.count()
+        total_reviews = FilmReview.objects.count()
+        total_views = 0  # You can implement view tracking later
+    except ImportError:
+        total_films = 0
+        total_users = 0
+        total_reviews = 0
+        total_views = 0
+    
     context = {
-        "title" : "dashboard"
+        "title": "Dashboard",
+        "total_films": total_films,
+        "total_users": total_users,
+        "total_reviews": total_reviews,
+        "total_views": total_views,
     }
     return render(request, template_name, context)
 
