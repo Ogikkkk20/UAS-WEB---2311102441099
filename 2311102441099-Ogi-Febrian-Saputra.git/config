@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/Dejavu20/2311102441099-Ogi-Febrian-Saputra.git
+	tagOpt = --no-tags
+	fetch = +refs/*:refs/*
+	mirror = true

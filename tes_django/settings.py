@@ -26,10 +26,10 @@ SECRET_KEY = 'django-insecure-!f&o&#ztm1ao9vk-r2-=ucl+%f05aq@9307a76*!_#^mgbfx0g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['.vercel.app']
 
 
-# Application definition
+# Application definitionx``
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -81,9 +81,9 @@ WSGI_APPLICATION = 'tes_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_blog',
+        'NAME': 'db.123',
         'USER': 'root',
-        'PASSWORD': 'nazriel2112',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
     }
