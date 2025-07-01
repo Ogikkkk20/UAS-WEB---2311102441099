@@ -1,0 +1,363 @@
+/* Advanced Animations for Modern Dashboard */
+
+/* Loading animations */
+@keyframes shimmer {
+    0% {
+        background-position: -200px 0;
+    }
+
+    100% {
+        background-position: calc(200px + 100%) 0;
+    }
+}
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes slideInFromBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    70% {
+        transform: scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(168, 85, 247, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+    }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px rgba(168, 85, 247, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(168, 85, 247, 0.5);
+    }
+}
+
+/* Apply animations */
+.animate-fade-in-scale {
+    animation: fadeInScale 0.6s ease-out;
+}
+
+.animate-slide-in-bottom {
+    animation: slideInFromBottom 0.8s ease-out;
+}
+
+.animate-bounce-in {
+    animation: bounceIn 0.8s ease-out;
+}
+
+.animate-pulse-ring {
+    animation: pulse 2s infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.shimmer {
+    background: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+    background-size: 200px 100%;
+    animation: shimmer 1.3s linear infinite;
+}
+
+/* Advanced card effects */
+.card-hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(168, 85, 247, 0.1);
+}
+
+/* Gradient borders */
+.gradient-border {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+}
+
+.gradient-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    padding: 2px;
+    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168, 85, 247, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #5a6fd8, #6a42a0);
+}
+
+/* Interactive button effects */
+.btn-gradient {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-gradient:hover::before {
+    left: 100%;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Loading skeleton */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Notification badges */
+.notification-badge {
+    position: relative;
+}
+
+.notification-badge::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+/* Dark mode styles */
+.dark .bg-white {
+    background-color: #1f2937;
+}
+
+.dark .text-gray-900 {
+    color: #f9fafb;
+}
+
+.dark .text-gray-600 {
+    color: #d1d5db;
+}
+
+.dark .text-gray-500 {
+    color: #9ca3af;
+}
+
+.dark .border-gray-200 {
+    border-color: #374151;
+}
+
+/* CKEditor Customization */
+.ckeditor-wrapper {
+    position: relative;
+}
+
+.ck-editor {
+    border-radius: 12px !important;
+    border: 1px solid #e5e7eb !important;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.ck-editor:focus-within {
+    border-color: #a855f7 !important;
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1) !important;
+}
+
+.ck-editor__top {
+    border-bottom: 1px solid #f3f4f6 !important;
+    background: #f9fafb !important;
+}
+
+.ck-toolbar {
+    background: #f9fafb !important;
+    border: none !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 8px 12px !important;
+}
+
+.ck-toolbar__separator {
+    background: #e5e7eb !important;
+}
+
+.ck-button {
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+}
+
+.ck-button:hover {
+    background: #e5e7eb !important;
+    transform: translateY(-1px);
+}
+
+.ck-button.ck-on {
+    background: #a855f7 !important;
+    color: white !important;
+}
+
+.ck-content {
+    min-height: 150px !important;
+    padding: 16px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    border-radius: 0 0 12px 12px !important;
+}
+
+.ck-content:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* CKEditor Dark Mode Support */
+.dark .ck-editor {
+    border-color: #374151 !important;
+}
+
+.dark .ck-editor__top {
+    background: #1f2937 !important;
+    border-bottom-color: #374151 !important;
+}
+
+.dark .ck-toolbar {
+    background: #1f2937 !important;
+}
+
+.dark .ck-content {
+    background: #111827 !important;
+    color: #f9fafb !important;
+}
+
+.dark .ck-button:hover {
+    background: #374151 !important;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .card-hover-lift:hover {
+        transform: none;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-2px);
+    }
+}
