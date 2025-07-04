@@ -84,7 +84,7 @@ DATABASES = {
         'NAME': 'railway',
         'USER': 'root',
         'PASSWORD': 'bIItyRjuRSBJyNtBZsPDFuYZLodKXMso',
-        'HOST': 'mysql.railway.internal',
+        'HOST': 'crossover.proxy.rlwy.net',
         'PORT': '3306',
     }
 }
