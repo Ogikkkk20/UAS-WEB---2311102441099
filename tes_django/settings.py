@@ -85,7 +85,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'bIItyRjuRSBJyNtBZsPDFuYZLodKXMso',
         'HOST': 'crossover.proxy.rlwy.net',
-        'PORT': '3306',
+        'PORT': '12683',
     }
 }
 
