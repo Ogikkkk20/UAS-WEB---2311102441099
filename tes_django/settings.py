@@ -81,10 +81,10 @@ WSGI_APPLICATION = 'tes_django.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db.123',
+        'NAME': 'railway',
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'crossover.proxy.rlwy.net:12683/railway',
+        'PASSWORD': 'bIItyRjuRSBJyNtBZsPDFuYZLodKXMso',
+        'HOST': 'mysql.railway.internal',
         'PORT': '3306',
     }
 }
